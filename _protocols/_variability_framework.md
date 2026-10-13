@@ -1,0 +1,128 @@
+# Variability in High-Throughput Immunoprofiling Assays
+### A Conceptual Framework for PhIP-Seq and MIPSA
+
+---
+
+## 1. The Operational Definition
+
+Variability, as used in this framework, has a precise meaning: **repeat the same measurement process on the same fixed unit under the same protocol conditions and get different answers.** That is measurement variability. Technical replicates of the right design — same sample, same library, same operator, same run — can estimate its baseline level. Some of this baseline is irreducible, set by the physics and chemistry of the assay. Some of it is inflated by specific steps in the sample processing workflow.
+
+**What we are interested in** is identifying the most probable sources of the most impactful *inflated* variability — noise introduced by sample handling conditions that is unrelated to the biology being measured, and that degrades the signal-to-noise ratio of sample comparisons.
+
+---
+
+## 2. A Taxonomy of What Variability Is Not
+
+Three things are commonly conflated with measurement variability. They are not the same, and treating them as the same leads to both analytical errors and misdirected remediation effort.
+
+### 2.1 Feature Heterogeneity
+
+Peptide tiles and ORFs differ systematically in length, GC content, secondary structure, and expression efficiency. These differences produce reproducible, consistent differences in assay response across features — not noise. A tile with 65% GC content that consistently returns lower counts than a tile with 45% GC content *across all samples* is exhibiting a feature effect, not measurement variability.
+
+Feature heterogeneity is better understood as a property of the library — the probe efficiency term in an RMA-like model — than as noise to be reduced. Two points follow from this:
+
+- If feature heterogeneity is **consistent across samples**, it does not confound comparisons between samples. The fold-over-background calculation implicitly accounts for it, since the feature is equally suppressed in both sample and mock IP.
+- If the primary analysis is the **identification of differentially reactive features** (hit calling), removing feature heterogeneity is not obviously beneficial and may not be necessary at all. What matters is whether the heterogeneity is consistent — if it is, it cancels in the comparison.
+
+Where feature heterogeneity becomes a problem is when it is **not consistent** — for example, when an interaction between a specific peptide sequence and a specific serum composition produces inflated counts in some samples but not others. This is the border between feature heterogeneity and sample-specific measurement noise, and it is worth watching for.
+
+**The consistency assumption must not be taken for granted.** The relationship between a feature property — GC content, ORF size, secondary structure — and its assay response could be modulated by reagent lot differences, sample matrix effects, environmental conditions, or operator. If the GC-capture relationship shifts between sample sets or batches, what appeared to be a stable feature effect becomes a feature-by-batch interaction: neither pure feature heterogeneity nor pure measurement noise, and considerably harder to correct for. The same argument applies to cis-coupling efficiency in MIPSA B3, to phage amplification fitness in PhIP-Seq B1, and to any other step currently labelled 🔷.
+
+**The practical implication** is that 🔷 labels carry an implicit assumption of cross-batch and cross-sample-set stability. That assumption should be verified, not assumed. The tool for verification is diagnostic plots — and their use is not optional.
+
+### 2.2 Biological Variability
+
+Differences in antibody reactivity between individuals, or within the same individual over time, are the signal, not the noise. Biological variability is what the assay is designed to detect. It should not be conflated with measurement variability, and efforts to "reduce variability" that inadvertently suppress biological signal are counterproductive.
+
+### 2.3 Analytical Variability
+
+Differences in results arising from choices of normalisation method, statistical model, or significance threshold are real and consequential — but they are a property of the analysis pipeline, not of the measurement process. In the protocol descriptions that follow, protocol conditions and downstream analysis choices are assumed fixed. Analytical variability is held constant and not considered further here.
+
+---
+
+## 3. The Criteria for Flagging a Step as High-Variability
+
+Given this taxonomy, the variability indicators in the protocol steps are focused on one specific question: **which steps in the sample processing workflow are the most probable sources of inflated, sample-specific measurement noise unrelated to the biology of the sample?**
+
+A step is flagged as high-variability (🔴) when:
+
+- The step outcome varies in ways that are **sample-specific** — not consistent across all samples equally
+- The variation is **not biologically driven** — it reflects handling conditions, reagent quality, or stochastic process efficiency
+- The variation **degrades the comparability** of samples in the count matrix, inflating apparent differences or masking real ones
+- The variation is **not already captured** by the mock IP background controls
+
+A step is flagged as feature heterogeneity (🔷) when:
+
+- The variation is **feature-specific** (tied to properties of the peptide or ORF) rather than sample-specific
+- It is **consistent across samples** — the same features are systematically affected regardless of which sample is being processed
+- It is better addressed by **modelling** (probe efficiency estimation) than by experimental remediation
+
+> ⚠ **The consistency assumption is empirical, not guaranteed.** A 🔷 label means the effect is *expected* to be consistent under stable protocol conditions. It does not mean consistency has been verified. When comparing across batches, reagent lots, or sample sets, this assumption must be checked with diagnostic plots before proceeding with analysis. If the assumption fails, the effect becomes a feature-by-batch interaction — see below.
+
+A step produces a **feature-by-batch interaction** when:
+
+- A feature property (GC content, ORF size, secondary structure) that normally produces a consistent, predictable effect **changes its relationship to assay response** across batches, reagent lots, or sample sets
+- The effect is neither fully sample-specific nor fully feature-specific — it is a product of both
+- It is the most insidious source of error in cross-study or longitudinal comparisons, because it is invisible within a single batch
+- It can only be detected by **diagnostic plots** comparing feature-level response distributions across batches
+
+Steps that introduce genuine sample-specific noise are the primary targets for protocol optimisation and statistical correction. Steps that introduce consistent feature effects are candidates for modelling. Steps where consistency cannot be assumed require diagnostic verification before any cross-batch analysis.
+
+---
+
+## 4. Summary Table
+
+| Type | Definition | Example in MIPSA / PhIP-Seq | Implication |
+|---|---|---|---|
+| **Measurement variability** 🔴 | Repeat same measurement on same unit, get different answers | Bead IP capture efficiency varying between samples (C3) | Target for protocol optimisation; degrades sample comparability |
+| **Feature heterogeneity** 🔷 | Consistent, reproducible difference in assay response across library members — *assumed stable across batches* | GC-content bias in oligo synthesis (A2); cis-coupling rate varying by ORF size (B3) | Model as probe efficiency term; verify consistency across batches with diagnostic plots |
+| **Feature-by-batch interaction** ⚠ | Feature heterogeneity that is not stable — the feature-assay relationship shifts across batches, reagent lots, or sample sets | GC-capture relationship changing between synthesis batches; cis-coupling rate shifting with HaloLigand primer lot | Most insidious cross-study error; invisible within a batch; requires diagnostic plots to detect |
+| **Biological variability** | True differences in antibody reactivity between samples | Individual differences in autoantibody titre | The signal — do not suppress |
+| **Analytical variability** | Differences arising from analysis choices | edgeR vs BEER vs Z-score hit lists | Held constant; addressed separately in analysis framework |
+
+---
+
+## 5. Diagnostic Plots Are Not Optional
+
+Assumptions do not announce when they have failed. The distinction between feature heterogeneity and feature-by-batch interaction is not something that can be reasoned about from first principles — it has to be looked at. Diagnostic plots are the mechanism by which the analyst finds out whether the assumptions underlying the analysis are actually holding.
+
+This is not a peripheral concern. In a high-dimensional count matrix with hundreds of thousands of features and a modest number of samples, a feature-by-batch interaction that goes undetected will silently inflate false positive rates or suppress true signal in ways that are nearly impossible to recover from after the fact. The cost of a diagnostic plot is minutes. The cost of missing a batch effect is the integrity of the study.
+
+The following plots are considered **necessary** for responsible analysis of PhIP-Seq and MIPSA data:
+
+**Within-study, within-batch**
+
+- Count distribution per sample (boxplot or violin) — samples should have similar distributions after normalisation; outliers signal processing failures
+- Pearson correlation heatmap of all samples — mock IPs must cluster together; serum controls must be consistent
+- PCA of all samples — batch effects, outlier samples, and unexpected clustering are visible here before any hypothesis testing
+- Mean-variance relationship per feature — used to assess model fit and identify features with anomalous overdispersion
+
+**Across batches or sample sets (cross-study or longitudinal)**
+
+- Feature-level count distributions stratified by batch — GC content bins, ORF size bins — to check whether the feature-response relationship is stable
+- Correlation of mock IP profiles across batches — if the background structure shifts, feature heterogeneity has become a feature-by-batch interaction
+- MA plots comparing batch-matched controls — systematic shifts in the MA plot indicate batch effects that will confound cross-batch comparisons
+
+**Model diagnostics (if a probe-aggregation model is fitted)**
+
+- Residual plots per feature — systematic patterns in residuals indicate model misspecification
+- Probe efficiency estimates (γ) plotted against GC content and feature length — should show the expected relationship; unexpected patterns indicate batch-level shifts
+- Posterior predictive checks (if Bayesian model) — simulated data from the fitted model should resemble the observed data
+
+The production of these plots at each stage of analysis is a minimum standard. Presenting results without them is presenting conclusions without showing the work.
+
+---
+
+## 6. A Note on the RMA Analogy
+
+This taxonomy maps directly onto the proposed probe-aggregation model. In the RMA framework:
+
+- The **antigen reactivity term** (β) captures biological variability — the signal
+- The **probe efficiency term** (γ) captures feature heterogeneity — consistent, feature-level effects estimated across all samples
+- The **residual** captures measurement variability — the sample-specific noise that remains after both effects are accounted for
+
+The insight is that explicitly modelling feature heterogeneity (rather than ignoring it or treating it as noise) allows the residual to more purely reflect genuine measurement variability. This improves both sensitivity and the interpretability of uncertainty estimates.
+
+---
+
+*This document is a companion to `PhIPSeq_protocol.md` and `MIPSA_protocol.md`. Variability indicators in those documents should be read in light of the taxonomy defined here.*

@@ -1,0 +1,137 @@
+---
+title:  Improving MIPSA Reaction Estimates by Appropriate Modelling
+---
+
+
+## Starting Point
+
+In our introductory conversation, you noted the structural parallel between the MIPSA data readout and the microarray probe-aggregation problem that motivated RMA. This memo develops that observation into a concrete proposal. The core argument is simple: **the data structure produced by MIPSA is richer than current per-tile / per-UCI testing exploits, and a principled probe-aggregation model would recover more of that information — improving sensitivity, specificity, and the interpretability of per-antigen estimates.**
+
+<br/>
+
+## The Problem, Stated Precisely
+
+Current MIPSA data processing treats each peptide tile (in peptide libraries) or each UCI (in full-length ORFeome libraries) as an independent observation, and calls hits at the individual tile/UCI level using edgeR, with a post-hoc confirmation rule requiring multiple tiles to agree. This is a reasonable starting point, but it has three limitations:
+
+**1. It does not model probe-level efficiency explicitly.**
+Some tiles are better probes of their antigen than others — because they span the actual epitope, present it in an accessible conformation, or have favourable biophysical properties. This tile-specific efficiency is a systematic, not random, effect. Treating it as noise inflates variance estimates and reduces sensitivity, particularly for antigens with weak or moderate reactivity.
+
+**2. The confirmation rule is informal and lossy.**
+Requiring two or more tiles to be independently significant is a conservative heuristic. It does not borrow strength across tiles in any principled way, and it collapses the tile-level data into a binary per-antigen call without propagating uncertainty. A model that explicitly aggregates across tiles would be more sensitive and would produce calibrated confidence measures.
+
+**3. The two library types present structurally different probe-aggregation problems that deserve distinct treatment.**
+
+- In **peptide libraries** (e.g. VirSIGHT), the protein is tiled into overlapping fragments. Tiles covering the same epitope are positively correlated; tiles from different regions of the same protein are probing distinct potential epitopes. Aggregation here is about synthesising evidence across partially redundant, partially independent probes.
+
+- In **full-length ORFeome libraries** (e.g. HuSIGHT), each protein is represented by multiple UCIs — independent barcoded copies of the same molecule, with UCI-specific capture efficiency. This is the closer analogue to the classic multi-probe microarray problem: the UCIs are measuring the same thing, and the goal is to separate the true signal from UCI-level noise.
+
+A unified modelling framework should handle both, while being explicit about the structural differences.
+
+***
+
+## The Proposed Model
+
+### Conceptual Foundation — RMA as the Template
+
+The Robust Multi-array Average (RMA) model for microarray data decomposes the observed probe signal as:
+
+> log(observed signal) = antigen effect + probe effect + noise
+
+where:
+- the **antigen effect** is what we want to estimate — the true reactivity of a given antigen in a given sample
+- the **probe effect** captures systematic tile/UCI-specific efficiency, shared across samples
+- the **noise** is residual variation, assumed iid
+
+RMA estimates these components jointly using a log-additive model, with robust fitting to reduce the influence of outlier probes.
+
+### Adapting to MIPSA — A Negative Binomial Probe-Aggregation Model
+
+The key departure from RMA is that MIPSA data is count-based and overdispersed. The appropriate likelihood is the **negative binomial**, which accommodates the excess variance observed in sequencing count data. The proposed model is:
+
+> Count(tile *i*, antigen *j*, sample *k*) ~ NegBin(μ_ijk, φ_i)
+
+where:
+
+> log(μ_ijk) = α_j + β_jk + γ_i
+
+- **α_j** is an antigen-level baseline (library representation effect)
+- **β_jk** is the per-sample antigen reactivity — the quantity of interest
+- **γ_i** is the tile/UCI-specific efficiency effect, estimated across samples
+- **φ_i** is the tile-specific overdispersion parameter
+
+The model is fit using empirical Bayes shrinkage, borrowing strength across tiles and across antigens to stabilise estimates — particularly for antigens with few tiles or low counts.
+
+The output of the model is not a per-tile p-value, but a **per-antigen, per-sample posterior estimate of reactivity**, with associated uncertainty. This is a fundamentally more informative data product than the current hit/no-hit binary call.
+
+### Mock IPs as the Baseline
+
+Mock IP samples (PBS controls) play the role of the background reference, exactly as in current edgeR-based pipelines. In the proposed model, mock IPs provide the empirical null distribution for β_jk, against which sample reactivities are compared. The structure of the model means that tile-level efficiency estimates (γ_i) are identified from the full sample set, including mock IPs, before reactivity estimation.
+
+***
+
+## What This Would Deliver
+
+### For Infinity Bio's Service Offering
+
+- **Improved sensitivity** for weak or early-stage antibody responses — relevant for longitudinal studies, vaccine trials, and early disease detection
+- **More interpretable per-antigen estimates** — continuous reactivity scores with uncertainty, rather than binary calls
+- **Better cross-study comparability** — tile efficiency estimates, once established for a library, are transferable across projects, enabling systematic batch correction
+- **A defensible, published statistical framework** — which strengthens Infinity Bio's scientific positioning and supports peer-reviewed publications from client data
+
+### For the Field
+
+A methodology paper describing the model would be a contribution to the broader antibody reactome profiling literature — relevant not just to MIPSA but to PhIP-Seq and related technologies. Given the current absence of a principled probe-aggregation framework in this space, it would fill a recognised gap.
+
+***
+
+## Proposed Work Plan
+
+*The timelines below assume 100% dedication of my time to this project. Any reduction in that commitment, or delays in data access from Infinity Bio's side, would extend the schedule proportionally.*
+
+### Phase 1 — Model Development and Validation (Weeks 1–4)
+- Formalise the negative binomial probe-aggregation model for both library types
+- Implement a prototype in R, building on the existing edgeR infrastructure
+- Validate on existing Infinity Bio datasets with known positives (e.g. IBM / NT5C1A, interferon autoantibodies from the COVID-19 cohort)
+- Benchmark sensitivity and specificity against current per-tile edgeR pipeline
+
+### Phase 2 — Refinement and Software Implementation (Weeks 5–8)
+- Extend model to handle cross-reactive tiles (peptide libraries) and mixed library experiments
+- Implement transferable tile efficiency estimates for batch correction across studies
+- Package as a documented, tested R package suitable for integration into Infinity Bio's bioinformatics pipeline
+
+### Phase 3 — Manuscript Preparation (Weeks 9–12)
+- Write up methodology, validation results, and biological findings
+- Target a methods-oriented journal (e.g. *Bioinformatics*, *Genome Biology*, or *Nature Methods*)
+
+***
+
+## Collaborators
+
+This work would be led by **[Your Name]**. The composition of the broader team is to be determined, and we welcome a conversation with Infinity Bio about how existing statistical collaborators might be engaged in or alongside this work.
+
+***
+
+## What We Need from Infinity Bio
+
+- Access to **raw barcode count matrices** (FASTQ-processed) from existing projects, covering both library types, with associated mock IP controls and known-positive samples
+- Clarity on the **tile design parameters** for VirSIGHT and HuSIGHT libraries (tile length, overlap, UCI redundancy per ORF)
+- A designated **scientific point of contact** for iterative feedback during model development
+- Alignment on **publication and IP terms** before Phase 1 begins
+
+***
+
+## Why Now
+
+The antibody reactome field is growing rapidly — the TEDDY collaboration, the AIT partnership, and the recent Series A all point to a scaling trajectory where data volume will increase faster than the current analytical framework can absorb it. Investing in a principled measurement model now, while the library designs are relatively stable and the known-positive validation datasets are available, is significantly cheaper than retrofitting it later. And a published statistical methodology would be a durable scientific asset for Infinity Bio — one that compounds in value as the field matures.
+
+***
+
+*We welcome your thoughts and are happy to discuss any aspect of this proposal at your convenience.*
+
+
+<!--
+## nohup Rscript -e "rmarkdown::render('_4-MIPSA_modelling_proposal.Rmd')" > _4-MIPSA_modelling_proposal.log  &
+
+subtitle: A Scientific Memo to Ben Larman, Infinity Bio
+
+-->

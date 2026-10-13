@@ -1,0 +1,19 @@
+*Variability key: 🟢 Low | 🟡 Medium | 🔴 High*
+
+---
+
+# Comparative Summary: PhIP-Seq vs MIPSA
+
+| Dimension | PhIP-Seq | MIPSA | Key Difference |
+|---|---|---|---|
+| **Library format** | Peptide tiles on phage | Full-length proteins OR peptide tiles, soluble | MIPSA enables conformational epitope detection |
+| **Barcode linkage** | Phage genome IS the barcode | Covalent HaloTag–HaloLigand bond | MIPSA barcoding is chemical, not biological |
+| **Highest variability step** | Phage panning (C2/C3) | RT + self-assembly (B2/B3) | Different mechanistic bottlenecks |
+| **Background control** | Mock IP (PBS panning) | Mock IP (PBS, column 12) | Structurally equivalent |
+| **Hit calling** | Per-tile edgeR, BEER, or Z-score | Per-UCI edgeR + multi-UCI confirmation | MIPSA has explicit designed-in redundancy |
+| **Conformational epitopes** | No | Yes (full-length library) | Fundamental biological difference |
+| **Protocol maturity** | High (v4, video protocol, widely replicated) | Medium (v3, Infinity Bio operational, less openly documented) | PhIP-Seq has more community validation |
+
+---
+
+*Primary sources: Larman et al. (2011); Mohan & Larman et al. (2018); Credle & Larman et al. (2022); Larman lab bioRxiv (2021); Infinity Bio VirSIGHT Report (2024); Frontiers in Bioinformatics review (2024).*

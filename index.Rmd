@@ -1,0 +1,110 @@
+---
+title: "On the analysis of PhIP-Seq Data"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+bibliography: [_Refs/_MIPSA_references.bib]
+#, _Refs/GRAIL_Liu_2020/_GRAIL_Liu_2020.bib]
+#_Refs/Liu_2025/_Liu_2025.bib]
+csl: _csl/cell-numeric.csl
+link-citations: true
+---
+
+
+<!--
+<p style="background-color: yellow; padding: 5px;">
+  <span style="font-weight: bold;">⚠️  Reports written by claude.ai - some content may require validation.</span>
+</p>
+
+The RMA modeling bit has been checked.
+-->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = NA,
+                      warning = FALSE,
+                      error = FALSE,
+                      message = FALSE,
+                      cache = FALSE,
+                      fig.width = 8,
+                      fig.height = 4)
+```
+
+
+```{r index-GlobalOptions, results="hide", include=FALSE, cache=FALSE}
+
+knitr::opts_knit$set(stop_on_error = 2L) #really make it stop
+options(knitr.table.format = 'html')
+
+options(stringsAsFactors=F)
+
+ #knitr::dep_auto()
+
+```
+<!-- ######################################################################## -->
+
+
+```{r index-Prelims,  include=FALSE, echo=FALSE, results='hide', message=FALSE} 
+
+
+FN <- "index"
+if(sum(grepl(FN, list.files()))==0) stop("Check FN")
+
+PREFIX <- "index" #- replace by FLOWCELL???
+
+ suppressMessages(require(rmarkdown))
+ suppressMessages(require(knitr))
+ suppressPackageStartupMessages(require(methods))
+ suppressPackageStartupMessages(require(bookdown))
+ suppressPackageStartupMessages(require(magrittr))
+
+ # Shotcuts for knitting and rendering while in R session (Invoke interactive R from R/Scripts folder)
+ kk <- function(n='') knitr::knit2html(paste("t", n, sep=''), envir=globalenv(),
+       output=paste(FN,".html", sep=''))
+
+ rr <- function(n='') rmarkdown::render(paste("t", n, sep=''), envir=globalenv(),
+       output_file=paste(FN,".html", sep='')) ##, output_dir='Scripts')
+
+ bb <- function(n='') browseURL(paste(FN,".html", sep=''))
+
+ # The usual shortcuts
+ zz <- function(n='') source(paste("t", n, sep=''))
+
+```
+<!-- ######################################################################## -->
+
+# Content {-}
+
+
+<p><p/>
+* [Antibody Reactome - Data and Analysis Primer](_1-antibody_reactome_primer.html)
+   - a gentle introduction to the antibody reactome.
+
+<p><p/>
+* [The Technology Landscape — PhIP-Seq, REAP, and MIPSA](_2-primer_addendum_PhIPSeq_REAP_MIPSA.html)
+
+<p><p/>
+* [Variability Framework](_3.0-variability_framework.html)
+   - What are the various kinds of variability
+
+<p><p/>
+* Protocols
+   - [PhIPSeq](_3.1-PhIPSeq_protocol.html)
+   - [MIPSA](_3.2-MIPSA_protocol.html)
+   - [PhIPSeq vs MIPSA](_3.3-PhIPSeq_vs_MIPSA_protocols.html)
+
+<p><p/>
+* References
+   - PhIPSeq
+   - MIPSA
+
+<p><p/>
+* Slides
+   - [MIPSA_reactome_intro](may_presentation/_MIPSA_reactome_intro.html)`
+   - [antibody_reactome_primer_sections_1-4](may_presentation/_antibody_reactome_primer_sections_1-4.html)
+   
+<!-- To run
+## nohup Rscript -e "knitr::knit2html('index.Rmd')" > index.log  &
+    
+## Or 
+## nohup Rscript -e "rmarkdown::render('index.Rmd')" > index.log  &
+    
+-->

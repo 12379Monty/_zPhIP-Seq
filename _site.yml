@@ -1,0 +1,8 @@
+name: "PhIP-Seq Data Analysis"
+output_dir: "."
+navbar:
+  title: "Studying antibody reactomics with PhIP-Seq"
+  left:
+    - text: "Home"
+      href: index.html
+

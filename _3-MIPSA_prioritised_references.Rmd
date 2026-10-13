@@ -1,0 +1,116 @@
+---
+title: Reference List — MIPSA Data Processing & Modelling
+---
+
+### Prioritised for the Task of "Improving MIPSA Reaction Estimates by Appropriate Modelling"
+
+
+## Tier 1 — Directly Foundational to the Modelling Task
+
+**Chen, A., et al. (2022)**
+*Detecting and quantifying antibody reactivity in PhIP-Seq data with BEER.*
+Bioinformatics, 38(19), 4647–4655.
+https://academic.oup.com/bioinformatics/article/38/19/4647/6663763
+
+The closest existing work to the proposed model. BEER implements a Bayesian hierarchical model for count-level probe aggregation in PhIP-Seq/MIPSA data, and explicitly addresses the sensitivity gap for weakly reactive peptides. Any new modelling framework should position itself clearly relative to BEER.
+
+---
+
+**Robinson, M. D., McCarthy, D. J., & Smyth, G. K. (2010)**
+*edgeR: a Bioconductor package for differential expression analysis of digital gene expression data.*
+Bioinformatics, 26(1), 139–140.
+
+The current workhorse for MIPSA hit calling. The proposed model must benchmark against it. Understanding its negative binomial, empirical Bayes dispersion estimation framework is prerequisite knowledge.
+
+---
+
+**Irizarry, R. A., et al. (2003)**
+*Exploration, normalization, and summaries of high density oligonucleotide array probe level data.*
+Biostatistics, 4(2), 249–264.
+
+The RMA paper — the direct methodological ancestor of the proposed model. Establishes the log-additive probe-aggregation framework and robust fitting approach that the MIPSA model adapts into the count / negative binomial setting.
+
+---
+
+## Tier 2 — Structurally Important, Directly Informative
+
+**Credle, J. J., et al. (Larman lab) (2022)**
+*Unbiased discovery of autoantibodies associated with severe COVID-19 via genome-scale self-assembled DNA-barcoded protein libraries.*
+Nature Biomedical Engineering.
+https://pmc.ncbi.nlm.nih.gov/articles/PMC10034860/
+
+The primary technical reference for MIPSA. Critical for understanding UCI structure in full-length ORFeome libraries, the role of mock IPs, and the existing informatic pipeline. The Methods section is essentially the starting specification for the modelling work.
+
+---
+
+**Infinity Bio (2024)**
+*VirSIGHT MIPSA Report — Sample Report.*
+https://www.infinitybio.com/wp-content/uploads/2024/07/Infinity-Bio_IB0000_VirSIGHT_Report-1.html
+
+The most explicit operational description of the current data processing pipeline: Bowtie2 alignment, mock IP structure, edgeR hit calling, and QC metrics. The direct target for improvement in Phase 1.
+
+---
+
+## Tier 3 — Useful Context, Less Directly Actionable
+
+**Galloway, J. G., et al. (2023)**
+*Phippery — integrated processing of PhIP-Seq raw data.*
+GitHub / Software release.
+
+Relevant for Phase 2 (software packaging). Useful reference for what pipeline infrastructure already exists so the proposed R package does not duplicate it unnecessarily.
+
+---
+
+**Liebhoff, A-M., Venkataraman, T., Morgenlander, W. R., ..., Larman, H. B. (2024)**
+*Efficient encoding of large antigenic spaces by epitope prioritization with Dolphyn.*
+Nature Communications, 15, 1577.
+https://www.nature.com/articles/s41467-024-45601-8
+
+Relevant to library design and peptide tile efficiency. The machine-learning-based tile selection approach in Dolphyn directly informs what drives probe-level efficiency differences (γ_i in the proposed model).
+
+---
+
+## Tier 4 — Background / Field Context
+
+**Larman, H. B., et al. (2011)**
+*Autoantigen discovery with a synthetic human peptidome.*
+Nature Biotechnology, 29(6), 535–541.
+
+The foundational PhIP-Seq paper. Establishes the peptide tiling and immunoprecipitation-sequencing paradigm that MIPSA builds on. Essential background for the manuscript introduction.
+
+---
+
+**Wang, E. Y., Rosen, C. E., et al. (2022)**
+*High-throughput identification of autoantibodies that target the human exoproteome.*
+Cell Reports Methods, 2(3), 100172.
+https://pmc.ncbi.nlm.nih.gov/articles/PMC8967185/
+
+The foundational REAP paper. Relevant as a complementary technology to MIPSA with a distinct display mechanism and antigen scope. Useful for contextualising MIPSA's positioning in the manuscript.
+
+---
+
+**Frontiers in Bioinformatics (2024)**
+*PhIP-Seq: methods, applications and challenges.*
+https://www.frontiersin.org/journals/bioinformatics/articles/10.3389/fbinf.2024.1424202/full
+
+and
+
+**Molecular & Cellular Proteomics (2024)**
+*Phage Immunoprecipitation and Sequencing — a Versatile Technique for Mapping the Antibody Reactome.*
+https://www.mcponline.org/article/S1535-9476(24)00121-X/fulltext
+
+Both useful for the manuscript introduction and for citing the acknowledged absence of a standardised, principled analysis pipeline — which directly motivates the proposed work.
+
+---
+
+## Note on the RMA Literature More Broadly
+
+The broader normalisation literature from the early microarray era (Speed lab, ~2001–2005) provides useful methodological grounding, particularly on robust probe-level estimation and between-array normalisation. This is background rather than required citation, but worth keeping accessible.
+
+
+
+<!--
+
+## nohup Rscript -e "rmarkdown::render('_3-MIPSA_prioritised_references.Rmd')" > _3-MIPSA_prioritised_references.log  &
+
+-->

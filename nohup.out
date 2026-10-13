@@ -1,0 +1,45 @@
+
+
+processing file: _3.1-PhIPSeq_protocol.Rmd
+1/1
+output file: _3.1-PhIPSeq_protocol.knit.md
+
+/usr/local/bin/pandoc +RTS -K512m -RTS _3.1-PhIPSeq_protocol.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output _3.1-PhIPSeq_protocol.html --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --template /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpBd2hSC/rmarkdown-strf4e8181b29e8.html --variable navbar=1 --variable theme=cosmo --css styles.css --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpBd2hSC/rmarkdown-strf4e81f5c4ab5.html --include-before-body _sidebar.html --include-after-body _footer.html 
+
+Output created: _3.1-PhIPSeq_protocol.html
+
+
+processing file: _3.1-PhIPSeq_protocol.Rmd
+1/1
+output file: _3.1-PhIPSeq_protocol.knit.md
+
+/usr/local/bin/pandoc +RTS -K512m -RTS _3.1-PhIPSeq_protocol.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output _3.1-PhIPSeq_protocol.html --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --template /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpiiEyJb/rmarkdown-str751c687df228.html --variable navbar=1 --variable theme=cosmo --css styles.css --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpiiEyJb/rmarkdown-str751c24a555b0.html --include-before-body _sidebar.html --include-after-body _footer.html 
+
+Output created: _3.1-PhIPSeq_protocol.html
+
+
+processing file: _3.1-PhIPSeq_protocol.Rmd
+1/1
+output file: _3.1-PhIPSeq_protocol.knit.md
+
+/usr/local/bin/pandoc +RTS -K512m -RTS _3.1-PhIPSeq_protocol.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output _3.1-PhIPSeq_protocol.html --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --template /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpAc1nXc/rmarkdown-str752e33e5eaf6.html --variable navbar=1 --variable theme=cosmo --css styles.css --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpAc1nXc/rmarkdown-str752e3ba4d718.html --include-before-body _sidebar.html --include-after-body _footer.html 
+
+Output created: _3.1-PhIPSeq_protocol.html
+
+
+processing file: _3.1-PhIPSeq_protocol.Rmd
+1/1
+output file: _3.1-PhIPSeq_protocol.knit.md
+
+/usr/local/bin/pandoc +RTS -K512m -RTS _3.1-PhIPSeq_protocol.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output _3.1-PhIPSeq_protocol.html --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --template /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpCMa56v/rmarkdown-str16e1f79fbc931.html --variable navbar=1 --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpCMa56v/rmarkdown-str16e1f155ee88.html 
+
+Output created: _3.1-PhIPSeq_protocol.html
+
+
+processing file: _3.1-PhIPSeq_protocol.Rmd
+1/1
+output file: _3.1-PhIPSeq_protocol.knit.md
+
+/usr/local/bin/pandoc +RTS -K512m -RTS _3.1-PhIPSeq_protocol.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output _3.1-PhIPSeq_protocol.html --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/latex-div.lua --lua-filter /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmarkdown/lua/table-classes.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --template /Users/fcollin/Library/R/x86_64/4.4/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpRKDVF8/rmarkdown-str16fe366f55650.html --variable navbar=1 --variable theme=bootstrap --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /var/folders/jk/d24lm6n944q5y650lph85m7w0000gp/T//RtmpRKDVF8/rmarkdown-str16fe374f5d2fe.html 
+
+Output created: _3.1-PhIPSeq_protocol.html

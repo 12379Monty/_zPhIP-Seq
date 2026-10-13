@@ -1,0 +1,214 @@
+---
+title: The Antibody Reactome - Data and Analysis Primer
+always_allow_html: yes
+output:
+  html_document:
+    code_folding: hide
+    code_download: true
+    toc: true
+    toc_depth: 2
+    # does this have an effect
+    fig_caption: yes
+---
+
+---
+
+<br/>
+
+## 1. What is an Antibody?
+
+The immune system's job is to distinguish *self* from *non-self* — and to neutralize anything foreign. Antibodies are the precision instruments it uses to do that. Each antibody is a Y-shaped protein produced by B cells, with two binding sites at the tips of the Y that recognize a specific molecular target, called an **antigen**. The region of the antigen that is actually bound is called an **epitope**.
+
+The key engineering insight is this: antibodies are generated through a process of quasi-random recombination and mutation, meaning the immune system can, in principle, produce an astronomically large diversity of binding specificities — estimates put it at around 10¹⁵ unique antibodies. This is not a bug. It's the system's way of being ready for anything.
+
+---
+
+## 2. From DNA to Antibodies and Antigens — and Why That Matters for Measurement
+
+### 2.1 The Central Dogma as the Starting Point
+
+Both antibodies and antigens are proteins, and proteins are the end product of the same fundamental biological process: **DNA is transcribed into RNA, which is translated into a chain of amino acids — a peptide — which folds into a functional protein**. This is the central dogma of molecular biology, and it is the backbone of everything that follows.
+
+A **peptide** is simply a short amino acid chain. A **protein** is a longer, folded one. The distinction is mostly one of length and structural complexity, not kind. Antigens and antibodies are both proteins; what differs is their origin, function, and the immune logic that connects them.
+
+<br/>
+
+### 2.2 What is an Antigen?
+
+An antigen is any molecule — almost always a protein or a fragment of one — that the immune system can recognize and respond to. Antigens can come from:
+
+- **Pathogens** — viral coat proteins, bacterial surface proteins, toxins
+- **The host itself** — in autoimmunity, the immune system generates antibodies against its own proteins
+- **Environmental sources** — allergens like pollen or food proteins
+
+Critically, the immune system does not respond to an entire protein uniformly. It responds to specific regions of that protein — **epitopes** — which are typically short stretches of 5–20 amino acids that happen to be physically accessible and structurally recognizable. This means that, at the molecular level, antibody reactivity is fundamentally a **peptide-level phenomenon**, even when the antigen is a full-length protein.
+
+<br/>
+
+### 2.3 What is an Antibody, Molecularly Speaking?
+
+An antibody is itself a protein, encoded in DNA, produced by B cells. The remarkable thing is that the genes encoding the antigen-binding region of an antibody are not fixed in the germline — they are assembled on the fly through a process called **V(D)J recombination**, in which gene segments are randomly shuffled and joined. This somatic recombination, followed by rounds of mutation and selection in response to antigen exposure, is what generates the enormous diversity of the antibody repertoire.
+
+So the antibody is a protein whose sequence is partly determined by the genome and partly by a stochastic, exposure-driven process happening within the lifetime of the organism. This is what makes the antibody reactome biographically informative in a way that the genome alone is not.
+
+<br/>
+
+### 2.4 How the DNA → Peptide → Protein Chain Enables Measurement
+
+Here is where the central dogma closes the loop into something practically exploitable.
+
+Because every protein — including every antigen — is ultimately encoded in DNA, you can:
+
+1. **Design the antigen library in silico** — take any set of protein sequences (a human proteome, all known viral proteins, a set of allergens), tile them into overlapping peptides, and synthesize the corresponding DNA sequences computationally
+2. **Express the proteins from that DNA** — using cell-free transcription and translation systems, you can produce the actual peptide or protein library in the lab
+3. **Attach a unique DNA barcode to each library member** — this is what MIPSA does via its self-assembly mechanism, covalently linking a DNA identifier to each expressed protein
+4. **Use sequencing to read out what was captured** — when antibodies in a sample bind their target antigens, those antigens (and their attached barcodes) are pulled down. Sequencing the barcodes tells you *which* antigens were bound, and in what quantities
+
+The elegance of this is that the **measurement currency is DNA throughout** — from library design, to barcoding, to readout. The biology happens in the middle (proteins binding proteins), but the experimental bookkeeping is entirely nucleotide-based, which makes it compatible with the high-throughput sequencing infrastructure that has transformed genomics. In effect, an immunological binding experiment is converted into a sequencing experiment.
+
+<!--
+This is not incidental to how MIPSA works — it is the foundational insight.
+-->
+
+---
+
+## 3. What is the Antibody Reactome?
+
+The **antibody reactome** is the complete set of antigen-binding reactivities present in a biological sample — typically blood serum or plasma — at a given point in time. Think of it as a **snapshot of immunological history**: every pathogen encountered, every vaccine received, every self-protein the immune system has mistakenly targeted, every allergen that has triggered a response.
+
+If the genome is the blueprint and the transcriptome is what's being expressed, the antibody reactome is something different — it's a **record of exposures and responses**, written in the language of binding specificities.
+
+For a data scientist, the useful framing is this: the antibody reactome is a **high-dimensional, sparse binary (or count) matrix** — rows are individuals, columns are antigens, and entries reflect whether a given individual has circulating antibodies that bind a given antigen, and at what level.
+
+---
+
+## 4. Why is it Interesting?
+
+### 4.1 It is an Omic with Memory
+
+Unlike gene expression, which fluctuates with conditions, antibody reactivities are relatively **durable**. An infection years ago can leave a detectable antibody signature today. This makes the reactome unusual among omics — it carries longitudinal information in a cross-sectional measurement.
+
+<br/>
+
+### 4.2 It Encodes Exposure History at Population Scale
+
+At the population level, the reactome is a rich epidemiological signal. Patterns of reactivity across individuals can reveal which pathogens a community has been exposed to, which vaccines are working, and how immune responses cluster across demographic groups.
+
+<br/>
+
+### 4.3 It Can Detect Disease — Including Before Symptoms
+
+Autoantibodies — antibodies that mistakenly target the body's own proteins — are associated with a wide range of diseases, from lupus and rheumatoid arthritis to certain cancers. In some cases, autoantibodies appear **years before clinical diagnosis**, making the reactome a candidate for early detection.
+
+<br/>
+
+### 4.4 It is a Hard Measurement Problem
+
+Until recently, measuring the antibody reactome comprehensively was not feasible. Technologies like protein microarrays could probe thousands of antigens but were expensive and limited in content. The real breakthrough came with **sequencing-based display methods** — PhIP-Seq, and more recently MIPSA — which allow hundreds of thousands of antigens to be probed simultaneously across many samples, with the readout being a count matrix from next-generation sequencing.
+
+This is where the data problem becomes genuinely interesting: you have a very wide matrix (hundreds of thousands of antigens), a moderate number of samples, extreme sparsity, heavy-tailed count distributions, and a background noise structure that must be estimated from mock immunoprecipitation controls run alongside every experiment.
+
+---
+
+## 5. The Observed Data and the Probe Aggregation Problem
+
+This is where the biology and statistics meet in a way that deserves careful attention.
+
+### 5.1 Epitopes, Peptide Tiles, and Full-Length Proteins — What is Actually in the Assay?
+
+There is a three-level hierarchy worth keeping straight:
+
+- An **epitope** is the 5–20 amino acid contact surface that an antibody physically binds. It is never directly observed — it is inferred.
+- A **peptide tile** is a 20–63 amino acid fragment of a protein, synthesized and barcoded as a library member. It *contains* one or more potential epitopes. This is what generates counts in the data.
+- A **full-length protein** is the entire protein sequence. Whether it appears in the assay depends on the library type.
+
+MIPSA operates with two distinct library types, and this distinction matters statistically:
+
+**Peptide libraries** (e.g. VirSIGHT): the proteome of interest is tiled into overlapping peptide fragments. The full-length protein is never present — only its tiles. Each antigen is represented by multiple overlapping tiles, each of which is an imperfect, partial probe of the underlying reactivity.
+
+**Full-length ORFeome libraries** (e.g. HuSIGHT): the entire protein is expressed and barcoded. However, each protein is represented by multiple **UCIs** (unique clonal identifiers) at roughly 10x redundancy — multiple independent barcoded copies of the same protein, each measured separately.
+
+In both cases, what hits the sequencer is not the antigen itself. It is a **set of count-valued, noisy proxies** — tiles or UCIs — each measuring the same underlying binding event with different efficiency.
+
+<br/>
+
+### 5.2 Sensitivity and Specificity Vary Across Tiles
+
+For peptide libraries, not all tiles covering the same antigen are equally informative:
+
+- Some tiles happen to span the actual epitope and bind well — **high sensitivity**
+- Some tiles miss the epitope or present it in an inaccessible conformation — **low sensitivity**
+- Some tiles span regions shared with other proteins due to sequence homology — **low specificity**, cross-reactive signal
+
+This means the data for any given antigen is an ensemble of probes with heterogeneous signal-to-noise properties. Treating each tile independently, without aggregating across tiles, discards information and inflates the multiple comparisons burden.
+
+<br/>
+
+### 5.3 The RMA Analogy
+
+Anyone who has worked with gene expression microarrays will recognise the structure immediately. In RMA (Robust Multi-array Average), multiple probes measure the same gene, each with probe-specific affinity and background. The RMA model is:
+
+> observed signal = gene expression effect + probe-specific effect + noise
+
+The parallel in MIPSA is:
+
+> observed barcode count = true antibody reactivity + tile/UCI-specific efficiency effect + noise
+
+For full-length protein libraries, the multiple UCIs per ORF are almost exactly analogous to multiple probes per gene — same target, independently measured, with probe-level noise. For peptide libraries, the analogy holds at the antigen level when aggregating across overlapping tiles.
+
+This probe-aggregation framing has practical consequences:
+
+- A **single reactive tile** is weak evidence — it could be noise, cross-reactivity, or a technical artefact
+- **Multiple overlapping tiles** all showing reactivity to the same antigen is strong evidence — the signal is consistent across independent probes
+- An RMA-like model that explicitly estimates tile/UCI effects and shrinks noisy probes toward a common mean would provide a more robust per-antigen summary than treating each tile as an independent test
+
+<br/>
+
+### 5.4 Where the Count Structure Requires Departing from RMA
+
+The key difference from the microarray setting is that MIPSA data is **count-based and heavily overdispersed** — the variance grows faster than the mean, which violates the log-additive Gaussian assumptions underlying RMA. The appropriate distributional family is the **negative binomial**, which is exactly what edgeR implements for hit calling at the individual tile/UCI level.
+
+The open statistical question — and an interesting one — is how a principled probe-aggregation model in the negative binomial family, analogous to RMA but adapted for counts, would compare with the current practice of calling hits at the tile level and then requiring multiple tiles to confirm. 
+
+My guess is that for the most part they will agree but the modeling approach
+will provide some robustness that will yield valid results where the current
+method doesn't.
+
+Additionally, an appropriate model will produce residuals which
+can be extremely useful for QC purposes.
+
+
+---
+
+## 6. The Data Challenge in Brief (**in preparation**)
+
+The core statistical task is: **given a matrix of read counts, determine which antigen-sample pairs represent true antibody binding rather than background noise.** This is complicated by:
+
+- **Library bias** — some antigens are captured more efficiently than others regardless of antibody binding
+- **Non-specific binding** — beads and reagents pull down some library members regardless of sample
+- **Overdispersion** — count data is noisier than a Poisson model would predict
+- **Multiple comparisons at scale** — with hundreds of thousands of antigens per sample, false discovery is a real concern
+- **Probe heterogeneity** — tiles and UCIs measuring the same antigen differ in efficiency, and naive per-tile testing ignores this structure
+
+These are exactly the kinds of problems where the choice of statistical framework matters — and where assumptions, if left unexamined, can quietly corrupt the results.
+
+---
+
+## Key Terms at a Glance
+
+| Term | Definition |
+|---|---|
+| **Antigen** | A protein (or fragment) recognized by the immune system |
+| **Epitope** | The specific 5–20 aa region of an antigen bound by an antibody |
+| **Peptide tile** | A 20–63 aa fragment used as a library member in peptide-based assays |
+| **UCI** | Unique Clonal Identifier — the DNA barcode attached to each library member in MIPSA |
+| **Mock IP** | A control reaction with no sample; used to estimate background binding |
+| **Reactome** | The full set of antigen-binding reactivities in a sample |
+| **V(D)J recombination** | The somatic gene shuffling process that generates antibody diversity |
+| **edgeR** | R package implementing negative binomial models for count data; used for MIPSA hit calling |
+| **RMA** | Robust Multi-array Average — a probe-aggregation model from microarray analysis with structural parallels to the MIPSA data problem |
+
+<!--
+nohup Rscript -e "rmarkdown::render('_1-antibody_reactome_primer.Rmd')" > _1-antibody_reactome_primer.log  &
+   
+-->

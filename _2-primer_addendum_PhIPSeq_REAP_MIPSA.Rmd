@@ -1,0 +1,66 @@
+---
+title: The Technology Landscape — PhIP-Seq, REAP, and MIPSA
+--- 
+*This addendum is intended as a companion to the Antibody Reactome Primer. It situates MIPSA within the broader field of sequencing-based antibody profiling technologies by describing the two most important predecessors and complements: PhIP-Seq and REAP.*
+
+---
+
+## A.1 PhIP-Seq — The Founding Technology
+
+**Foundational reference:** Larman, H. B., et al. (2011). *Autoantigen discovery with a synthetic human peptidome.* Nature Biotechnology, 29(6), 535–541.
+
+PhIP-Seq (Phage Immunoprecipitation Sequencing) is the technology from which MIPSA directly descends. The core idea is to display a large library of peptides on the surface of bacteriophage (viruses that infect bacteria), incubate the phage library with patient serum, pull down antibody-bound phages using magnetic beads, and identify what was captured by sequencing the DNA inserts encoding each displayed peptide.
+
+The library is constructed by tiling proteins of interest — the human proteome, all known viruses, panels of allergens — into overlapping peptide fragments typically 36–56 amino acids long, synthesising the corresponding DNA sequences, and cloning them into the phage genome. The sequencing readout is a count matrix: for each sample, how many times was each peptide's sequence recovered.
+
+**What PhIP-Seq does well:** extremely high throughput, low cost per sample, scales to hundreds of thousands of peptides and hundreds of samples. Has been used to profile the antibody reactome against the entire human virome (VirScan), the full human proteome, and many specialist libraries.
+
+**Its key limitation:** phage display is a prokaryotic expression system. Peptides are short, linear, and unfolded. This means PhIP-Seq can only detect antibodies that recognise **linear epitopes** — contiguous stretches of amino acids that bind an antibody regardless of 3D structure. Antibodies that recognise **conformational epitopes** (which require the protein to fold into its native 3D shape) are largely invisible to PhIP-Seq. Estimates suggest that as many as 90% of antibodies recognise conformational rather than linear epitopes, which is a substantial blind spot.
+
+---
+
+## A.2 REAP — Profiling the Exoproteome
+
+**Foundational reference:** Wang, E. Y., Rosen, C. E., et al. (2022). *High-throughput identification of autoantibodies that target the human exoproteome.* Cell Reports Methods, 2(3), 100172.
+
+REAP (Rapid Extracellular Antigen Profiling) takes a different approach: instead of phage, it uses **yeast** as the display organism. Yeast is a eukaryote, which means its cellular machinery can perform the post-translational modifications (glycosylation, disulfide bond formation, signal peptide cleavage) that many extracellular proteins require to fold correctly. The library — currently around 2,700–6,000 proteins — is displayed on the yeast cell surface, each strain genetically barcoded. Patient serum is incubated with the library, antibody-bound yeast are isolated by magnetic sorting, and sequencing of the barcodes identifies the captured antigens.
+
+**What REAP does well:** because proteins are displayed in a eukaryotic system in their native conformation, REAP can detect antibodies against conformational epitopes, including those on extracellular proteins (cytokines, receptors, growth factors, cell surface proteins) that are notoriously difficult to capture with peptide-based methods. It was designed specifically for the **exoproteome** — proteins secreted or expressed on the cell surface — which are often the most biologically consequential targets of autoantibodies.
+
+**Its key limitation:** the library is substantially smaller than PhIP-Seq or MIPSA libraries (thousands of proteins, not hundreds of thousands of peptides), and is restricted to extracellular proteins. Intracellular proteins, which are relevant to many autoimmune diseases, are out of scope.
+
+---
+
+## A.3 MIPSA — What it Does Differently
+
+**Foundational reference:** Credle, J. J., et al. (2022). *Unbiased discovery of autoantibodies associated with severe COVID-19 via genome-scale self-assembled DNA-barcoded protein libraries.* Nature Biomedical Engineering.
+
+MIPSA addresses the core limitation of PhIP-Seq — the inability to capture conformational epitopes — without the scope constraints of REAP. It does this through a cell-free expression system: proteins are synthesised in solution (not displayed on phage or yeast), using in vitro transcription and translation, and each protein is covalently linked to its own unique DNA barcode via the HaloTag self-assembly mechanism. The result is a library of soluble, full-length proteins — each tagged with an identifying barcode — that can be interrogated at proteome scale.
+
+The three-way comparison is summarised below:
+
+| | **PhIP-Seq** | **REAP** | **MIPSA** |
+|---|---|---|---|
+| **Display format** | Phage surface (prokaryotic) | Yeast surface (eukaryotic) | Cell-free solution (in vitro) |
+| **Library content** | Peptide tiles (linear fragments) | Full-length extracellular proteins | Full-length proteins OR peptide tiles |
+| **Conformational epitopes** | No | Yes (extracellular only) | Yes (full-length library) |
+| **Library scale** | Hundreds of thousands of peptides | ~2,700–6,000 proteins | ~11,000+ ORFs or hundreds of thousands of peptides |
+| **Antigen scope** | Any protein that can be tiled | Extracellular / secreted proteins only | Any protein expressible in cell-free system |
+| **Key advantage** | Scale, cost, throughput | Native conformation for extracellular proteins | Scale + conformation + flexibility |
+| **Key limitation** | Linear epitopes only | Small library, extracellular only | Cell-free expression may not capture all PTMs |
+
+**The key differentiating insight of MIPSA** is that by moving the display into solution — and using DNA barcoding for identification rather than physical separation of distinct library members — it decouples library scale from the constraints of any particular expression host. PhIP-Seq and REAP both require the library member to be physically associated with a cell or phage particle. MIPSA uses chemistry (the HaloTag covalent linkage) to attach the barcode directly to the protein during translation, enabling a library of freely soluble, conformationally intact proteins that is nonetheless fully addressable by sequencing.
+
+This is also what creates the probe-aggregation data structure described in Section 5 of the primer: because multiple UCIs (barcodes) are assigned to each ORF, and multiple overlapping tiles cover each protein in peptide libraries, the readout for any given antigen is an ensemble of imperfect probes — which is both the statistical challenge and the opportunity.
+
+---
+
+*For a full comparison of antibody profiling technologies in the context of autoimmune disease research, see: Frontiers in Bioinformatics (2024), PhIP-Seq: methods, applications and challenges; and MCP (2024), Phage Immunoprecipitation and Sequencing — a Versatile Technique for Mapping the Antibody Reactome.*
+
+
+    
+<!-- To run
+## nohup Rscript -e "rmarkdown::render('_2-primer_addendum_PhIPSeq_REAP_MIPSA.Rmd')" > _2-primer_addendum_PhIPSeq_REAP_MIPSA.log  &
+    
+-->
+

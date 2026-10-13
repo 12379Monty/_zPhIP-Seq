@@ -1,0 +1,73 @@
+/* ── Hide the default horizontal navbar ── */
+.navbar {
+  display: none !important;
+}
+
+body {
+  padding-top: 15px;
+  margin-left: 200px;
+}
+
+/* ── Left-side vertical nav ── */
+#site-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 180px;
+  height: 100vh;
+  overflow-y: auto;
+  background: #2c3e50;
+  padding: 20px 0;
+  z-index: 1030;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.15);
+}
+
+#site-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#site-sidebar li a {
+  display: block;
+  padding: 12px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  font-size: 14px;
+  border-right: 3px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+#site-sidebar li a:hover,
+#site-sidebar li a:focus {
+  background: #34495e;
+  border-right-color: #3498db;
+  color: #fff;
+}
+
+#site-sidebar li a.active {
+  background: #34495e;
+  border-right-color: #3498db;
+  font-weight: 600;
+}
+
+/* ── Responsive: collapse on narrow screens ── */
+@media (max-width: 768px) {
+  #site-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  #site-sidebar ul {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  #site-sidebar li a {
+    padding: 8px 14px;
+    border-right: none;
+    border-bottom: 3px solid transparent;
+  }
+  body {
+    margin-left: 0;
+  }
+}

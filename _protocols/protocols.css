@@ -1,0 +1,258 @@
+/*
+ * protocols.css
+ * Companion stylesheet for PhIPSeq_MIPSA_protocols.md
+ *
+ * Usage:
+ *   Pandoc:  pandoc protocols.md -c protocols.css -o protocols.html --standalone
+ *   VS Code: set "markdown.styles": ["protocols.css"] in settings.json
+ *   Typora:  place in Typora theme folder and select from Preferences > Appearance
+ */
+
+/* ── FONTS ── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── TOKENS ── */
+:root {
+  --navy:      #0d1f35;
+  --teal:      #0a7e72;
+  --teal-bg:   #e6f4f2;
+  --low:       #1a7a4a;
+  --low-bg:    #e8f5ee;
+  --med:       #b06d00;
+  --med-bg:    #fff4e0;
+  --high:      #c0392b;
+  --high-bg:   #fdecea;
+  --border:    #dde3ea;
+  --text:      #1c2b3a;
+  --muted:     #6b7c8d;
+  --bg:        #f5f7fa;
+  --white:     #ffffff;
+}
+
+/* ── BASE ── */
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 40px 80px;
+}
+
+/* ── HEADINGS ── */
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--navy);
+  border-bottom: 3px solid var(--teal);
+  padding-bottom: 12px;
+  margin: 48px 0 24px;
+}
+
+h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--navy);
+  margin: 40px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 32px 0 8px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--teal);
+  padding: 10px 16px;
+  border-radius: 0 6px 6px 0;
+}
+
+h4 {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin: 20px 0 8px;
+}
+
+/* ── PARAGRAPHS ── */
+p { margin: 0 0 12px; }
+
+/* ── BOLD LABELS (Description, QC, Variability) ── */
+p > strong:only-child,
+p strong {
+  color: var(--navy);
+}
+
+/* ── LISTS ── */
+ul, ol {
+  margin: 4px 0 16px 0;
+  padding-left: 20px;
+}
+
+li {
+  margin: 4px 0;
+  line-height: 1.6;
+}
+
+/* ── CONFIRMED QC MARKERS ── */
+/* ✓ items */
+li:has(> code) { }
+
+/* Style ✓ and ◇ markers in QC lists */
+ul li:first-child ~ li,
+ul li {
+  position: relative;
+}
+
+/* ── CODE / MONO ── */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+  background: #eef1f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--navy);
+}
+
+pre {
+  background: var(--navy);
+  color: #c8dae8;
+  padding: 16px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.83em;
+  line-height: 1.6;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* ── TABLES ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 20px 0 28px;
+  font-size: 0.86em;
+}
+
+thead tr {
+  background: var(--navy);
+  color: white;
+}
+
+thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.4px;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+tbody td {
+  padding: 10px 16px;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+/* ── HORIZONTAL RULES ── */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 32px 0;
+}
+
+/* ── BLOCKQUOTES (used for ⚠ notes) ── */
+blockquote {
+  background: var(--med-bg);
+  border-left: 4px solid var(--med);
+  margin: 16px 0;
+  padding: 12px 18px;
+  border-radius: 0 6px 6px 0;
+  color: #7a4f00;
+  font-size: 0.9em;
+}
+
+blockquote p { margin: 0; }
+
+/* ── VARIABILITY EMOJI STYLING ── */
+/*
+  The emoji lines (🟢 Low / 🟡 Medium / 🔴 High) appear as bold paragraphs.
+  We style the containing paragraph to stand out as a badge-like indicator.
+*/
+p:has(> strong:first-child) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 8px 0 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+/* ── ITALICS (used for source attributions) ── */
+em { color: var(--muted); }
+
+/* ── FOOTER NOTE ── */
+body > p:last-child {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ── PART DIVIDERS ── */
+h1:first-of-type {
+  margin-top: 0;
+}
+
+/* Visually separate Part 1 and Part 2 */
+h1 + hr,
+hr + hr {
+  border-top: 3px solid var(--border);
+  margin: 48px 0;
+}
+
+/* ── PRINT ── */
+@media print {
+  body {
+    background: white;
+    padding: 24px;
+    font-size: 13px;
+  }
+  h1, h2, h3 { page-break-after: avoid; }
+  table, blockquote { page-break-inside: avoid; }
+  pre { white-space: pre-wrap; }
+}

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIPSA Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1f35;
+    --navy-mid: #1a3350;
+    --teal: #0a7e72;
+    --teal-light: #e6f4f2;
+    --low: #1a7a4a;
+    --low-bg: #e8f5ee;
+    --med: #b06d00;
+    --med-bg: #fff4e0;
+    --high: #c0392b;
+    --high-bg: #fdecea;
+    --feat: #2255a0;
+    --feat-bg: #e8eef8;
+    --border: #dde3ea;
+    --text: #1c2b3a;
+    --muted: #6b7c8d;
+    --white: #ffffff;
+    --bg: #f5f7fa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  header { background: var(--navy); color: white; padding: 36px 48px 28px; border-bottom: 3px solid var(--teal); }
+  header .tag { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); margin-bottom: 10px; }
+  header h1 { font-family: 'DM Serif Display', serif; font-size: 2.2rem; font-weight: 400; }
+  header p { margin-top: 8px; color: #8fa8c0; font-size: 0.92rem; font-weight: 300; }
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 120px); }
+  .toc { background: var(--navy-mid); padding: 28px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .toc-title { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #5a7a99; padding: 0 24px 12px; border-bottom: 1px solid #1f3a55; margin-bottom: 16px; }
+  .toc-phase { padding: 6px 24px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #7fa3c0; margin-top: 10px; }
+  .toc-step { display: flex; align-items: center; gap: 10px; padding: 6px 24px 6px 32px; font-size: 0.82rem; color: #a8c4d8; cursor: pointer; transition: background 0.15s; text-decoration: none; }
+  .toc-step:hover { background: rgba(255,255,255,0.06); }
+  .toc-step.active { background: rgba(10,126,114,0.18); color: #5ddcc9; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-low { background: var(--low); }
+  .dot-med { background: var(--med); }
+  .dot-high { background: var(--high); }
+  .dot-feat { background: var(--feat); }
+  .legend { margin: 20px 24px 0; padding-top: 16px; border-top: 1px solid #1f3a55; }
+  .legend-title { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #5a7a99; margin-bottom: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: #8fa8c0; margin-bottom: 6px; }
+  main { padding: 32px 40px; overflow-y: auto; }
+  .phase-tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid var(--border); }
+  .phase-tab { padding: 10px 20px; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); cursor: pointer; border-radius: 6px 6px 0 0; border: 1px solid transparent; border-bottom: none; transition: all 0.15s; background: transparent; margin-bottom: -2px; }
+  .phase-tab:hover { color: var(--teal); background: var(--teal-light); }
+  .phase-tab.active { color: var(--navy); background: var(--white); border-color: var(--border); border-bottom-color: var(--white); }
+  .phase-panel { display: none; }
+  .phase-panel.active { display: block; }
+  .phase-header { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 18px 24px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+  .phase-label { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--navy); }
+  .phase-desc { font-size: 0.88rem; color: var(--muted); }
+  .step-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .step-tab { padding: 7px 16px; font-size: 0.82rem; font-weight: 500; border-radius: 6px; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; font-family: 'JetBrains Mono', monospace; }
+  .step-tab-low { color: var(--low); background: var(--low-bg); }
+  .step-tab-low:hover, .step-tab-low.active { border-color: var(--low); box-shadow: 0 0 0 2px rgba(26,122,74,0.15); }
+  .step-tab-med { color: var(--med); background: var(--med-bg); }
+  .step-tab-med:hover, .step-tab-med.active { border-color: var(--med); box-shadow: 0 0 0 2px rgba(176,109,0,0.15); }
+  .step-tab-high { color: var(--high); background: var(--high-bg); }
+  .step-tab-high:hover, .step-tab-high.active { border-color: var(--high); box-shadow: 0 0 0 2px rgba(192,57,43,0.15); }
+  .step-tab-feat { color: var(--feat); background: var(--feat-bg); }
+  .step-tab-feat:hover, .step-tab-feat.active { border-color: var(--feat); box-shadow: 0 0 0 2px rgba(34,85,160,0.15); }
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+  .step-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .step-card-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .step-card-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--navy); }
+  .var-badge { font-size: 0.72rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; }
+  .var-low { background: var(--low-bg); color: var(--low); }
+  .var-med { background: var(--med-bg); color: var(--med); }
+  .var-high { background: var(--high-bg); color: var(--high); }
+  .var-feat { background: var(--feat-bg); color: var(--feat); }
+  .step-sections { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+  .step-section { padding: 20px 24px; border-right: 1px solid var(--border); }
+  .step-section:last-child { border-right: none; }
+  /* Step output — first bullet of Description column only */
+  .step-section:first-child ul li:first-child {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    color: var(--teal);
+    font-size: 0.9rem;
+    font-weight: 400;
+    border-bottom: 1px solid var(--teal-light);
+    padding-bottom: 10px;
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+  .step-section:first-child ul li:first-child::before {
+    content: '▸';
+    color: var(--teal);
+    font-style: normal;
+  }
+  .section-title { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .step-section ul { list-style: none; padding: 0; }
+  .step-section ul li { font-size: 0.84rem; line-height: 1.55; color: var(--text); padding: 4px 0 4px 14px; position: relative; border-bottom: 1px solid #f0f2f5; }
+  .step-section ul li:last-child { border-bottom: none; }
+  .step-section ul li::before { content: '—'; position: absolute; left: 0; color: var(--teal); font-size: 0.75rem; }
+  .evolution { background: var(--navy); border-radius: 10px; padding: 20px 24px; margin-bottom: 28px; color: white; }
+  .evolution-title { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; }
+  .evolution table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .evolution th { text-align: left; color: #7fa3c0; font-weight: 500; padding: 6px 12px 10px 0; border-bottom: 1px solid #1f3a55; }
+  .evolution td { padding: 8px 12px 8px 0; color: #c8dae8; border-bottom: 1px solid #1a3350; vertical-align: top; }
+  .evolution tr:last-child td { border-bottom: none; }
+  .ver { color: #5ddcc9; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+  .callout { background: #fff8e1; border-left: 3px solid var(--med); border-radius: 0 8px 8px 0; padding: 12px 18px; margin-bottom: 20px; font-size: 0.84rem; color: #7a4f00; }
+  .path-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0 8px;
+    margin: 20px 0 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .path-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+  .path-label-orf  { background: var(--teal-light); color: var(--teal); }
+  .path-label-tile { background: var(--feat-bg); color: var(--feat); }
+  .path-note { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Part 2 of 3 — Protocol Reference</div>
+  <h1>MIPSA Protocol</h1>
+  <p>Molecular Indexing of Proteins by Self-Assembly &nbsp;·&nbsp; Larman lab (2021) through Infinity Bio current practice</p>
+</header>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="toc-title">Table of Contents</div>
+
+    <div class="toc-phase">Phase A &nbsp;·&nbsp; Library Assembly</div>
+    <div style="padding:3px 24px 2px 32px;font-size:0.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#5ddcc9;">ORFeome Path</div>
+    <a class="toc-step" onclick="goTo('A','A11')"><span class="dot dot-low"></span>A1.1 &nbsp; ORF Cloning &amp; Vector Design</a>
+    <a class="toc-step" onclick="goTo('A','A12')"><span class="dot dot-low"></span>A1.2 &nbsp; Plasmid Linearisation</a>
+    <div style="padding:6px 24px 2px 32px;font-size:0.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#7fbde8;">Peptide Tile Path</div>
+    <a class="toc-step" onclick="goTo('A','A21')"><span class="dot dot-low"></span>A2.1 &nbsp; Tile Design</a>
+    <a class="toc-step" onclick="goTo('A','A22')"><span class="dot dot-feat"></span>A2.2 &nbsp; Oligonucleotide Synthesis</a>
+    <a class="toc-step" onclick="goTo('A','A23')"><span class="dot dot-feat"></span>A2.3 &nbsp; Cloning into pDEST-MIPSA</a>
+
+    <div class="toc-phase">Phase B &nbsp;·&nbsp; Self-Assembly</div>
+    <a class="toc-step" onclick="goTo('B','B1')"><span class="dot dot-med"></span>B1 &nbsp; In Vitro Transcription</a>
+    <a class="toc-step" onclick="goTo('B','B2')"><span class="dot dot-feat"></span>B2 &nbsp; Reverse Transcription (HaloLigand)</a>
+    <a class="toc-step" onclick="goTo('B','B3')"><span class="dot dot-feat"></span>B3 &nbsp; Cell-Free Translation &amp; Cis Coupling</a>
+
+    <div class="toc-phase">Phase C &nbsp;·&nbsp; Immunoprecipitation</div>
+    <a class="toc-step" onclick="goTo('C','C1')"><span class="dot dot-med"></span>C1 &nbsp; Sample Preparation</a>
+    <a class="toc-step" onclick="goTo('C','C2')"><span class="dot dot-med"></span>C2 &nbsp; Serum–Library Incubation</a>
+    <a class="toc-step" onclick="goTo('C','C3')"><span class="dot dot-high"></span>C3 &nbsp; Protein A/G Magnetic Bead IP</a>
+
+    <div class="toc-phase">Phase D &nbsp;·&nbsp; Sequencing Prep</div>
+    <a class="toc-step" onclick="goTo('D','D1')"><span class="dot dot-med"></span>D1 &nbsp; PCR Amplification of UCI Barcodes</a>
+    <a class="toc-step" onclick="goTo('D','D2')"><span class="dot dot-low"></span>D2 &nbsp; Next-Generation Sequencing</a>
+
+    <div class="toc-phase">Phase E &nbsp;·&nbsp; Data Analysis</div>
+    <a class="toc-step" onclick="goTo('E','E1')"><span class="dot dot-low"></span>E1 &nbsp; Barcode Mapping &amp; Count Matrix</a>
+    <a class="toc-step" onclick="goTo('E','E2')"><span class="dot dot-med"></span>E2 &nbsp; Hit Calling with edgeR</a>
+
+    <div class="legend">
+      <div class="legend-title">Variability</div>
+      <div class="legend-item"><span class="dot dot-low"></span> Low</div>
+      <div class="legend-item"><span class="dot dot-med"></span> Medium</div>
+      <div class="legend-item"><span class="dot dot-high"></span> High (sample noise)</div>
+      <div class="legend-item"><span class="dot dot-feat"></span> Feature heterogeneity</div>
+    </div>
+  </nav>
+
+  <main>
+
+    <div class="evolution">
+      <div class="evolution-title">Protocol Evolution</div>
+      <table>
+        <tr><th>Version</th><th>Reference</th><th>Key Changes</th></tr>
+        <tr>
+          <td><span class="ver">v1</span></td>
+          <td>Larman lab, <em>bioRxiv</em>, March 2021</td>
+          <td>Proof-of-concept; IFNL3 autoantibody discovery; ~50% cis-barcoding; release factors excluded to improve cis rate</td>
+        </tr>
+        <tr>
+          <td><span class="ver">v2</span></td>
+          <td>Credle &amp; Larman et al., <em>Nat Biomed Eng</em>, 2022</td>
+          <td>11,076-ORF library; Gateway cloning; pDEST-MIPSA vector; I-SceI linearisation; 10× UCI redundancy per ORF</td>
+        </tr>
+        <tr>
+          <td><span class="ver">v3</span></td>
+          <td>Infinity Bio, ongoing (VirSIGHT / HuSIGHT)</td>
+          <td>Peptide tile libraries in same MIPSA framework; Dolphyn-optimised tile selection; 96-well plate processing; column 12 controls</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="phase-tabs">
+      <div class="phase-tab active" onclick="switchPhase('A',this)">Phase A</div>
+      <div class="phase-tab" onclick="switchPhase('B',this)">Phase B</div>
+      <div class="phase-tab" onclick="switchPhase('C',this)">Phase C</div>
+      <div class="phase-tab" onclick="switchPhase('D',this)">Phase D</div>
+      <div class="phase-tab" onclick="switchPhase('E',this)">Phase E</div>
+    </div>
+
+    <!-- PHASE A -->
+    <div id="panel-A" class="phase-panel active">
+      <div class="phase-header">
+        <div class="phase-label">Phase A</div>
+        <div class="phase-desc">Vector Construction and Library Assembly</div>
+      </div>
+      <div class="step-tabs">
+        <div class="step-tab step-tab-low active" onclick="switchStep('A','A1',this)">A1</div>
+        <div class="step-tab step-tab-low" onclick="switchStep('A','A2',this)">A2</div>
+      </div>
+
+      <div id="A-A1" class="step-panel active">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">A1 &nbsp;·&nbsp; pDEST-MIPSA Vector Design</div>
+            <span class="var-badge var-low">Low Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>MIPSA Gateway Destination vector (pDEST-MIPSA) encodes in order: T7 promoter, UCI barcode, E. coli RBS, N-terminal HaloTag (891 nt), FLAG epitope, Gateway recombination sites (ORF insertion), I-SceI site</li>
+                <li>UCI barcode sequence: (SW)₁₈–AGGGA–(SW)₁₈ where S = C/G and W = A/T — isothermal design ensures balanced GC content</li>
+                <li>Each ORF inserted by Gateway LR recombination from entry clone library (e.g. human ORFeome)</li>
+                <li>Each ORF represented by ~10 UCIs (unique barcoded copies) — the fundamental redundancy that enables probe-aggregation analysis</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Sanger sequencing of recombined clones to verify correct ORF orientation and reading frame fusion to HaloTag</li>
+                <li>Deep sequencing of plasmid pool to verify UCI barcode diversity (target: ~10 UCIs per ORF)</li>
+                <li>Confirm no frameshifts or stop codons introduced at recombination junctions</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>Vector design is fixed — minimal variability at this step</li>
+                <li>Gateway recombination efficiency varies by ORF size but is well-established</li>
+                <li>UCI diversity is stochastic by design — the isothermal sequence ensures uniqueness and identifiability</li>
+                <li>~10× UCI redundancy per ORF is the key design feature enabling multi-probe statistical aggregation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="A-A2" class="step-panel">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">A2 &nbsp;·&nbsp; Plasmid Linearisation</div>
+            <span class="var-badge var-low">Low Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>Circular pDEST-MIPSA plasmid pool linearised at the I-SceI restriction site downstream of each ORF</li>
+                <li>Linearisation prevents read-through transcription beyond the ORF, which would produce RNA templates of uncontrolled length</li>
+                <li>Uncontrolled length would interfere with RT-priming and HaloTag cis-coupling in Phase B</li>
+                <li>Linearised DNA purified by column or ethanol precipitation</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Gel electrophoresis to confirm complete linearisation (no supercoiled band remaining)</li>
+                <li>DNA quantification post-purification (Qubit or NanoDrop)</li>
+                <li>Any residual circular template will produce heterogeneous RNA and must be eliminated before IVT</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>I-SceI is a highly efficient and specific homing endonuclease — low intrinsic variability</li>
+                <li>Incomplete linearisation is the primary failure mode and is readily detected by gel electrophoresis</li>
+                <li>Operator error (wrong buffer, wrong temperature) is the main risk</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE B -->
+    <div id="panel-B" class="phase-panel">
+      <div class="phase-header">
+        <div class="phase-label">Phase B</div>
+        <div class="phase-desc">Self-Assembly — IVT, Reverse Transcription, and Cell-Free Translation</div>
+      </div>
+      <div class="callout">⚠ This is the mechanistically distinctive phase of MIPSA. Steps B1–B3 are tightly coupled — the RNA produced in B1 serves simultaneously as the translation template and the molecule to which the cDNA barcode is attached in B2, before self-assembly occurs during translation in B3.</div>
+      <div class="step-tabs">
+        <div class="step-tab step-tab-med active" onclick="switchStep('B','B1',this)">B1</div>
+        <div class="step-tab step-tab-feat" onclick="switchStep('B','B2',this)">B2</div>
+        <div class="step-tab step-tab-feat" onclick="switchStep('B','B3',this)">B3</div>
+      </div>
+
+      <div id="B-B1" class="step-panel active">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">B1 &nbsp;·&nbsp; In Vitro Transcription (IVT)</div>
+            <span class="var-badge var-med">Medium Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>Linearised pDEST-MIPSA pool used as template for in vitro transcription using T7 RNA polymerase</li>
+                <li>Produces pool of RNA molecules, each containing: UCI barcode, HaloTag coding sequence, ORF sequence</li>
+                <li>RNA serves dual role: translation template (encoding HaloTag-ORF fusion protein) AND the molecule to which the UCI cDNA barcode attaches in B2</li>
+                <li>RNA purified and quantified; stored at −80°C in small aliquots to avoid freeze-thaw degradation</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>RNA integrity check (Bioanalyzer or TapeStation) — degraded RNA reduces translation efficiency</li>
+                <li>RNA yield and concentration (Qubit)</li>
+                <li>Confirm expected size distribution of transcripts across ORF sizes</li>
+                <li>RNase contamination check — strict RNase-free technique required throughout</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>RNA is inherently less stable than DNA — the most chemically fragile intermediate in the pipeline</li>
+                <li>Transcription efficiency varies by template GC content and secondary structure</li>
+                <li>RNase contamination is a critical risk — a single contaminated reagent can destroy the entire pool</li>
+                <li>RNA degradation between IVT and the coupled RT/translation step is a meaningful source of per-ORF efficiency variability</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="B-B2" class="step-panel">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">B2 &nbsp;·&nbsp; Reverse Transcription with HaloLigand-Conjugated Primer</div>
+            <span class="var-badge var-feat">Feature Heterogeneity</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>RT primer conjugated to a succinimidyl ester–haloalkane (HaloLigand) moiety annealed to each RNA at position −32 nt upstream of the AUG start codon</li>
+                <li>Position −32 was empirically determined: primers within 20 nt of RBS interfere with ribosome assembly and abolish translation; −32 is the closest position that does not reduce translation yield</li>
+                <li>Reverse transcriptase synthesises cDNA from the UCI barcode region, producing an RNA:cDNA hybrid</li>
+                <li>Resulting structure: HaloLigand-conjugated cDNA physically proximal to the ribosome entry site, poised for cis coupling during translation in B3</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Confirm RT primer incorporation by gel or bioanalyzer</li>
+                <li>RT efficiency assessed by qPCR on cDNA product</li>
+                <li>Confirm HaloLigand coupling chemistry is intact (supplier QC certificates; functional validation by test translation with FLAG western blot)</li>
+                <li>Primer batch QC — each new lot must be validated before use in library-scale experiments</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>Most technically demanding and variable step in the MIPSA protocol</li>
+                <li>RT efficiency varies with RNA secondary structure, template GC content, and primer batch quality</li>
+                <li>HaloLigand conjugation chemistry must be intact — degraded or improperly conjugated primer breaks the barcode-protein link entirely</li>
+                <li>Batch-to-batch variability in the HaloLigand-conjugated primer is a real and important risk</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="B-B3" class="step-panel">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">B3 &nbsp;·&nbsp; Cell-Free Translation and Cis HaloTag Self-Assembly</div>
+            <span class="var-badge var-feat">Feature Heterogeneity</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>RNA:cDNA hybrid pool added to E. coli cell-free translation system</li>
+                <li>Release factors excluded from reaction to stall ribosomes at stop codons — improves cis-coupling efficiency</li>
+                <li>Translation order: HaloTag (N-terminal) → FLAG → ORF protein</li>
+                <li>As nascent HaloTag folds, it forms an irreversible covalent bond with the HaloLigand moiety on the nearby UCI cDNA — linking barcode to protein in cis</li>
+                <li>~50% of protein-UCI conjugates formed in cis; ~50% form in trans (a different protein's barcode coupled to a nearby HaloTag)</li>
+                <li>50% cis efficiency is sufficient for assay performance — trans events contribute to characterisable background noise</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Anti-FLAG western blot to confirm translation of HaloTag-FLAG-ORF fusion protein</li>
+                <li>Test IP of a known positive antigen (e.g. TRIM21, NT5C1A) with validated positive serum</li>
+                <li>Estimate cis coupling efficiency by pull-down with HaloLigand beads followed by qPCR of UCI region</li>
+                <li>Negative control: translation without HaloLigand-conjugated primer — should produce protein but no protein-UCI conjugate</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>Cis vs trans coupling ratio is inherently stochastic and varies by ORF size — larger proteins are released from ribosome before HaloTag matures, favouring trans coupling</li>
+                <li>50% cis efficiency is an average; actual rate varies per ORF — this is the fundamental source of UCI-level efficiency variation</li>
+                <li>This step is the statistical rationale for a probe-aggregation model: UCI-level efficiency is not uniform and must be estimated, not assumed</li>
+                <li>Release factor exclusion improves cis rate but introduces ribosome stalling — a trade-off managed empirically</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE C -->
+    <div id="panel-C" class="phase-panel">
+      <div class="phase-header">
+        <div class="phase-label">Phase C</div>
+        <div class="phase-desc">Immunoprecipitation</div>
+      </div>
+      <div class="step-tabs">
+        <div class="step-tab step-tab-med active" onclick="switchStep('C','C1',this)">C1</div>
+        <div class="step-tab step-tab-med" onclick="switchStep('C','C2',this)">C2</div>
+        <div class="step-tab step-tab-high" onclick="switchStep('C','C3',this)">C3</div>
+      </div>
+
+      <div id="C-C1" class="step-panel active">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">C1 &nbsp;·&nbsp; Sample Preparation and Dilution</div>
+            <span class="var-badge var-med">Medium Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>Patient or control serum/plasma diluted in IP buffer (typically 1:100 to 1:500)</li>
+                <li>Processed in 96-well plate format</li>
+                <li>Column 12 reserved for internal controls: serum controls (pooled, consistent across plates) and PBS mock IP controls (beads only, no serum)</li>
+                <li>Serum controls used for inter-plate QC; mock IPs are the primary background reference for data analysis</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Confirm sample identity and volume</li>
+                <li>Confirm consistent dilution factor across all samples</li>
+                <li>Flag samples with haemolysis or lipaemia (affects IgG recovery)</li>
+                <li>Internal serum controls must be from same pooled lot across all plates in a study</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>Sample quality (haemolysis, freeze-thaw history) varies across biobank specimens</li>
+                <li>Dilution factor affects the competition landscape — higher dilution reduces sensitivity but improves specificity</li>
+                <li>Column 12 control design is the most explicit QC structure in the MIPSA operational protocol</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="C-C2" class="step-panel">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">C2 &nbsp;·&nbsp; Incubation of Serum with MIPSA Library</div>
+            <span class="var-badge var-med">Medium Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>Diluted serum mixed with MIPSA protein-barcode library and incubated at 4°C with rotation for 16–18 hours</li>
+                <li>Serum antibodies bind to cognate antigens in the library — solution-phase binding, not surface-displayed</li>
+                <li>Solution-phase kinetics more closely approximate native immunoassay conditions than phage display</li>
+                <li>Conformational epitopes accessible because proteins are soluble and folded, not constrained by phage capsid</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Consistent library input across samples (normalised by protein concentration)</li>
+                <li>Positive control serum with known reactivity included on each plate</li>
+                <li>Mock IP (PBS) and serum-only controls in column 12</li>
+                <li>Temperature and rotation speed logged for each run</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>Total IgG varies between individuals — affects competition for library members</li>
+                <li>Temperature fluctuations and rotation inconsistencies affect binding kinetics</li>
+                <li>16–18 hour window introduces time-of-day variability if plates not processed simultaneously</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="C-C3" class="step-panel">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">C3 &nbsp;·&nbsp; Immunoprecipitation with Protein A/G Magnetic Beads</div>
+            <span class="var-badge var-high">High Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>Protein A/G magnetic beads capture IgG-antigen complexes</li>
+                <li>Beads separated magnetically and washed 3–5 times</li>
+                <li>Antibody-bound MIPSA library members (protein + covalently linked UCI cDNA barcode) retained on beads</li>
+                <li>Structurally equivalent to PhIP-Seq C3, but targets soluble protein-DNA conjugates rather than intact phage particles</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Mock IP control (PBS) run in parallel — primary background reference for all statistical comparisons</li>
+                <li>Positive control antigen recovery confirmed</li>
+                <li>Wash number and volume must be consistent across all samples</li>
+                <li>Wash stringency directly determines the false positive rate</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>Same bead-capture variability as PhIP-Seq C3</li>
+                <li>Additional risk: MIPSA proteins are soluble — incomplete washing releases more background material than from phage particles</li>
+                <li>Trans-coupled barcode-protein pairs (from B3) contribute to non-specific background that cannot be distinguished from true signal at the individual library member level</li>
+                <li>Bead lot variation is a batch-level risk requiring inter-lot validation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE D -->
+    <div id="panel-D" class="phase-panel">
+      <div class="phase-header">
+        <div class="phase-label">Phase D</div>
+        <div class="phase-desc">Sequencing Library Preparation and NGS</div>
+      </div>
+      <div class="step-tabs">
+        <div class="step-tab step-tab-med active" onclick="switchStep('D','D1',this)">D1</div>
+        <div class="step-tab step-tab-low" onclick="switchStep('D','D2',this)">D2</div>
+      </div>
+
+      <div id="D-D1" class="step-panel active">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">D1 &nbsp;·&nbsp; PCR Amplification of UCI Barcodes</div>
+            <span class="var-badge var-med">Medium Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>After washing, beads resuspended and UCI cDNA barcodes amplified by PCR</li>
+                <li>Universal primers flanking the UCI region used, with Illumina adapters and sample-specific indices added</li>
+                <li>UCIs are short (~50 bp) — PCR is efficient and requires fewer cycles than for PhIP-Seq inserts</li>
+                <li>Each sample generates one indexed sequencing library</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Gel electrophoresis to confirm PCR product at expected size</li>
+                <li>Quantify libraries (Qubit or qPCR)</li>
+                <li>Check for primer dimer contamination</li>
+                <li>Confirm index diversity across multiplexed samples</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>PCR cycle number affects representation — more cycles introduce greater amplification bias</li>
+                <li>Jackpot effects possible if input barcode counts are very low</li>
+                <li>Short UCI amplicons are less susceptible to length bias than PhIP-Seq inserts</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="D-D2" class="step-panel">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">D2 &nbsp;·&nbsp; Next-Generation Sequencing</div>
+            <span class="var-badge var-low">Low Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>Multiplexed libraries pooled and sequenced on Illumina (NextSeq or HiSeq)</li>
+                <li>Target: 1–3 million reads per sample</li>
+                <li>Single-end reads standard — UCIs are short fixed-length sequences</li>
+                <li>Higher alignment rates than PhIP-Seq due to short, structured barcode targets</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Per-sample aligned read count (target: >500,000)</li>
+                <li>Sequencing quality scores (Q30 threshold)</li>
+                <li>Alignment rate to validated UCI dictionary (target: >90%)</li>
+                <li>Per-sample Pearson correlation with serum controls (target: ≥0.90 among internal controls)</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>NGS is the most reproducible step in the pipeline</li>
+                <li>Main risk: uneven sample pooling before sequencing run</li>
+                <li>Run-to-run variability is low given standardised Illumina chemistry</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE E -->
+    <div id="panel-E" class="phase-panel">
+      <div class="phase-header">
+        <div class="phase-label">Phase E</div>
+        <div class="phase-desc">Data Analysis</div>
+      </div>
+      <div class="step-tabs">
+        <div class="step-tab step-tab-low active" onclick="switchStep('E','E1',this)">E1</div>
+        <div class="step-tab step-tab-med" onclick="switchStep('E','E2',this)">E2</div>
+      </div>
+
+      <div id="E-E1" class="step-panel active">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">E1 &nbsp;·&nbsp; Barcode-to-ORF Mapping and Count Matrix Generation</div>
+            <span class="var-badge var-low">Low Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>Raw reads aligned using Bowtie2 to a validated dictionary of mono-associated barcode-ORF pairs</li>
+                <li>Only UCIs confirmed to associate with a single ORF (by prior sequencing of unselected library) are retained</li>
+                <li>Count matrix generated: rows = UCI-ORF pairs, columns = samples, values = read counts</li>
+                <li>Multi-UCI structure per ORF is explicit in the matrix — each ORF has ~10 rows (one per UCI)</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Alignment rate to validated dictionary (target: >90%)</li>
+                <li>Per-sample read depth</li>
+                <li>Pearson correlation heatmap of serum controls across plates (target: ≥0.90)</li>
+                <li>Flag samples with anomalously low read counts or low inter-control correlation</li>
+                <li>PCA — mock IPs must cluster separately from serum samples</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>Alignment is a deterministic computational step — minimal variability for fixed aligner parameters</li>
+                <li>Validated UCI dictionary must be version-controlled and matched to the specific library lot used</li>
+                <li>UCI dictionary validation itself is a one-time upstream step with its own sequencing QC</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="E-E2" class="step-panel">
+        <div class="step-card">
+          <div class="step-card-header">
+            <div class="step-card-title">E2 &nbsp;·&nbsp; Hit Calling with edgeR</div>
+            <span class="var-badge var-med">Medium Variability</span>
+          </div>
+          <div class="step-sections">
+            <div class="step-section">
+              <div class="section-title">Description</div>
+              <ul>
+                <li>Each sample compared against full set of mock IP controls using edgeR (negative binomial model)</li>
+                <li>Fold-over-background (FOB) calculated per UCI per sample</li>
+                <li>Hits defined at FDR-adjusted p-value &lt; 0.05</li>
+                <li>Secondary confirmation rule applied: antigen called reactive if multiple UCIs targeting same ORF are independently significant</li>
+                <li>Current pipeline treats each UCI as an independent observation — no explicit probe-aggregation model</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">QC Measures</div>
+              <ul>
+                <li>Distribution of FOB values (should be approximately log-normal with heavy right tail)</li>
+                <li>Positive control reactivity confirmed at expected FOB level</li>
+                <li>Mock IPs cluster separately from serum samples in PCA</li>
+                <li>Per-plate Pearson correlation of serum controls ≥ 0.90</li>
+              </ul>
+            </div>
+            <div class="step-section">
+              <div class="section-title">Variability Introduced</div>
+              <ul>
+                <li>Current per-UCI, per-test approach does not model UCI-level efficiency — the variation introduced in B3 (cis vs trans coupling) is absorbed into noise rather than estimated</li>
+                <li>Multi-UCI confirmation rule is a conservative heuristic — reduces false positives at the cost of sensitivity for antigens with low cis-coupling efficiency or few UCIs</li>
+                <li>FDR-based thresholds carry all the limitations of p-value-derived inference at scale</li>
+                <li>This is the primary analytical limitation motivating the proposed RMA-like probe-aggregation model</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function switchPhase(phase, el) {
+    document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-' + phase).classList.add('active');
+  }
+  function switchStep(phase, stepId, el) {
+    const panel = document.getElementById('panel-' + phase);
+    panel.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'));
+    panel.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById(phase + '-' + stepId).classList.add('active');
+    updateTOC(stepId);
+  }
+  function goTo(phase, stepId) {
+    const phases = ['A','B','C','D','E'];
+    document.querySelectorAll('.phase-tab')[phases.indexOf(phase)].click();
+    setTimeout(() => {
+      const panel = document.getElementById('panel-' + phase);
+      panel.querySelectorAll('.step-tab').forEach(t => {
+        if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'" + stepId + "'")) t.click();
+      });
+    }, 50);
+    updateTOC(stepId);
+  }
+  function updateTOC(activeStep) {
+    document.querySelectorAll('.toc-step').forEach(s => {
+      s.classList.remove('active');
+      if (s.getAttribute('onclick') && s.getAttribute('onclick').includes("'" + activeStep + "'")) {
+        s.classList.add('active');
+      }
+    });
+  }
+</script>
+</body>
+</html>

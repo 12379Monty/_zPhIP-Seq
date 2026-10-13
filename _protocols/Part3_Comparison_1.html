@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhIP-Seq vs MIPSA — Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1f35;
+    --phip: #1a4a7a;
+    --phip-light: #e8f0fa;
+    --mipsa: #0a7e72;
+    --mipsa-light: #e6f4f2;
+    --low: #1a7a4a;
+    --low-bg: #e8f5ee;
+    --med: #b06d00;
+    --med-bg: #fff4e0;
+    --high: #c0392b;
+    --high-bg: #fdecea;
+    --border: #dde3ea;
+    --text: #1c2b3a;
+    --muted: #6b7c8d;
+    --white: #ffffff;
+    --bg: #f5f7fa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+  header { background: var(--navy); color: white; padding: 36px 48px 28px; border-bottom: 3px solid var(--mipsa); }
+  header .tag { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--mipsa); margin-bottom: 10px; }
+  header h1 { font-family: 'DM Serif Display', serif; font-size: 2.2rem; font-weight: 400; }
+  header p { margin-top: 8px; color: #8fa8c0; font-size: 0.92rem; font-weight: 300; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+
+  /* SECTION HEADERS */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--navy);
+    margin: 40px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  /* INTRO CARDS */
+  .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 8px; }
+  .intro-card { border-radius: 10px; padding: 24px; }
+  .intro-card.phip { background: var(--phip-light); border: 1.5px solid #b8cfe8; }
+  .intro-card.mipsa { background: var(--mipsa-light); border: 1.5px solid #a0d4ce; }
+  .intro-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 10px; }
+  .intro-card.phip h3 { color: var(--phip); }
+  .intro-card.mipsa h3 { color: var(--mipsa); }
+  .intro-card ul { list-style: none; padding: 0; }
+  .intro-card ul li { font-size: 0.85rem; line-height: 1.6; padding: 3px 0 3px 14px; position: relative; color: var(--text); }
+  .intro-card ul li::before { content: '—'; position: absolute; left: 0; color: var(--muted); font-size: 0.75rem; }
+
+  /* MAIN COMPARISON TABLE */
+  .comp-table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 8px; }
+  .comp-table thead tr { background: var(--navy); }
+  .comp-table thead th { padding: 14px 18px; text-align: left; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; }
+  .comp-table thead th:first-child { color: #8fa8c0; width: 18%; }
+  .comp-table thead th:nth-child(2) { color: #7fbde8; width: 38%; }
+  .comp-table thead th:nth-child(3) { color: #5ddcc9; width: 38%; }
+  .comp-table tbody tr { border-bottom: 1px solid var(--border); }
+  .comp-table tbody tr:last-child { border-bottom: none; }
+  .comp-table tbody tr:hover { background: #f9fafb; }
+  .comp-table td { padding: 14px 18px; font-size: 0.84rem; line-height: 1.55; vertical-align: top; }
+  .comp-table td:first-child { font-weight: 600; color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; border-right: 1px solid var(--border); }
+  .comp-table td:nth-child(2) { border-right: 1px solid var(--border); }
+  .advantage { color: #1a5c30; font-weight: 500; }
+  .limitation { color: #8b2020; }
+  .neutral { color: var(--muted); font-style: italic; }
+
+  /* VARIABILITY BY PHASE TABLE */
+  .var-table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 8px; }
+  .var-table thead tr { background: var(--navy); }
+  .var-table thead th { padding: 12px 18px; text-align: left; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; color: #8fa8c0; }
+  .var-table thead th:nth-child(2) { color: #7fbde8; }
+  .var-table thead th:nth-child(3) { color: #5ddcc9; }
+  .var-table tbody tr { border-bottom: 1px solid var(--border); }
+  .var-table tbody tr:last-child { border-bottom: none; }
+  .var-table tbody tr:hover { background: #f9fafb; }
+  .var-table td { padding: 12px 18px; font-size: 0.83rem; vertical-align: middle; }
+  .var-table td:first-child { font-size: 0.78rem; font-weight: 600; color: var(--muted); border-right: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; }
+  .var-table td:nth-child(2) { border-right: 1px solid var(--border); }
+
+  .badge { display: inline-block; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; padding: 3px 10px; border-radius: 12px; }
+  .badge-low { background: var(--low-bg); color: var(--low); }
+  .badge-med { background: var(--med-bg); color: var(--med); }
+  .badge-high { background: var(--high-bg); color: var(--high); }
+
+  /* STATS COMPARISON */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .stat-card h4 { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+  .stat-method { font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--navy); margin-bottom: 6px; }
+  .stat-desc { font-size: 0.82rem; line-height: 1.5; color: var(--text); }
+
+  /* KEY DIFFERENCES CALLOUTS */
+  .callout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+  .callout { border-radius: 10px; padding: 18px 20px; }
+  .callout h4 { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .callout ul { list-style: none; }
+  .callout ul li { font-size: 0.84rem; line-height: 1.6; padding: 3px 0 3px 14px; position: relative; }
+  .callout ul li::before { content: '—'; position: absolute; left: 0; font-size: 0.75rem; }
+  .callout-bio { background: #fdf6e8; border: 1px solid #e8d5a0; }
+  .callout-bio h4 { color: #7a5500; }
+  .callout-bio ul li { color: #5a3d00; }
+  .callout-bio ul li::before { color: #b08d00; }
+  .callout-stat { background: #f0e8f8; border: 1px solid #c8a8e8; }
+  .callout-stat h4 { color: #5a2080; }
+  .callout-stat ul li { color: #3d1560; }
+  .callout-stat ul li::before { color: #8040c0; }
+
+  /* PROBE STRUCTURE NOTE */
+  .probe-note { background: var(--navy); color: white; border-radius: 10px; padding: 24px 28px; margin-bottom: 8px; }
+  .probe-note h4 { color: var(--mipsa); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+  .probe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .probe-col h5 { color: #7fa3c0; font-size: 0.82rem; font-weight: 600; margin-bottom: 8px; }
+  .probe-col ul { list-style: none; }
+  .probe-col ul li { font-size: 0.83rem; line-height: 1.6; padding: 3px 0 3px 14px; position: relative; color: #c8dae8; }
+  .probe-col ul li::before { content: '—'; position: absolute; left: 0; color: #5ddcc9; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Part 3 of 3 — Protocol Reference</div>
+  <h1>PhIP-Seq vs MIPSA</h1>
+  <p>Side-by-side comparison of technology, variability profile, and analytical implications</p>
+</header>
+
+<div class="container">
+
+  <!-- INTRO CARDS -->
+  <div class="section-title">Technology Overview</div>
+  <div class="intro-grid">
+    <div class="intro-card phip">
+      <h3>PhIP-Seq</h3>
+      <ul>
+        <li>Phage display: peptide tiles expressed on T7 bacteriophage surface</li>
+        <li>Library: overlapping peptide fragments, 36–56 aa (length increased v1→v2)</li>
+        <li>Barcode = phage genome insert — genotype and phenotype physically linked on phage particle</li>
+        <li>Prokaryotic expression system — no post-translational modifications</li>
+        <li>Linear epitopes only — phage capsid prevents access to conformational epitopes</li>
+        <li>Mature technology: full Nature Protocols paper, video supplement, community-validated pipelines</li>
+      </ul>
+    </div>
+    <div class="intro-card mipsa">
+      <h3>MIPSA</h3>
+      <ul>
+        <li>Cell-free expression: full-length proteins synthesised in solution</li>
+        <li>Library: full-length ORFs (HuSIGHT) or peptide tiles (VirSIGHT)</li>
+        <li>Barcode = UCI cDNA covalently linked to protein via HaloTag/HaloLigand self-assembly during translation</li>
+        <li>E. coli cell-free system — limited post-translational modifications but folding possible</li>
+        <li>Conformational epitopes accessible — proteins are soluble and unconstrained</li>
+        <li>Newer technology: primary papers published 2021–2022; Infinity Bio commercial service ongoing</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- MAIN COMPARISON TABLE -->
+  <div class="section-title">Step-by-Step Protocol Comparison</div>
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>PhIP-Seq</th>
+        <th>MIPSA</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Library Design</td>
+        <td>In silico tiling using pepsyn tool; DNA synthesis on microarray platform; cloning into T7 phage</td>
+        <td>Gateway LR recombination of ORF library into pDEST-MIPSA vector; or in silico peptide tile design (VirSIGHT); Dolphyn-optimised tile selection available</td>
+      </tr>
+      <tr>
+        <td>Antigen Format</td>
+        <td>Short peptide tiles (36–56 aa) displayed on phage surface</td>
+        <td>Full-length proteins (HuSIGHT) or peptide tiles (VirSIGHT) in solution</td>
+      </tr>
+      <tr>
+        <td>Barcode Mechanism</td>
+        <td>Phage genome is the barcode — physical linkage between peptide and encoding DNA is intrinsic to phage biology</td>
+        <td>Covalent HaloTag–HaloLigand bond formed during translation; ~50% cis efficiency; trans coupling creates background</td>
+      </tr>
+      <tr>
+        <td>Expression System</td>
+        <td>T7 bacteriophage display in E. coli</td>
+        <td>E. coli cell-free in vitro translation</td>
+      </tr>
+      <tr>
+        <td>Epitope Access</td>
+        <td><span class="limitation">Linear epitopes only</span> — phage capsid geometry limits antibody access to conformational epitopes</td>
+        <td><span class="advantage">Linear and conformational epitopes</span> (full-length library) — soluble proteins, no steric constraint</td>
+      </tr>
+      <tr>
+        <td>Library Scale</td>
+        <td>Up to hundreds of thousands of peptide tiles per run (VirScan: 93,904 tiles from 206 viral species)</td>
+        <td>11,076 ORFs (HuSIGHT); comparable peptide tile scale for VirSIGHT</td>
+      </tr>
+      <tr>
+        <td>Sample Processing</td>
+        <td>Individual 1.5 ml tubes, typically; some labs use 96-well format</td>
+        <td>96-well plate format; column 12 reserved for serum and mock IP controls</td>
+      </tr>
+      <tr>
+        <td>Immunoprecipitation</td>
+        <td>Protein A/G beads capture IgG–phage complexes; 1–2 rounds of panning (v1: 2 rounds; v3+: 1 round)</td>
+        <td>Protein A/G beads capture IgG–protein complexes; single round; soluble proteins require more careful washing</td>
+      </tr>
+      <tr>
+        <td>Background Control</td>
+        <td>Mock IP (PBS, no serum) run in parallel</td>
+        <td>Mock IP (PBS) in column 12 of every 96-well plate; serum controls also in column 12</td>
+      </tr>
+      <tr>
+        <td>Sequencing Readout</td>
+        <td>PCR amplification of phage insert DNA; Illumina sequencing; 1–3M reads per sample</td>
+        <td>PCR amplification of UCI barcodes; Illumina sequencing; 1–3M reads per sample; shorter amplicons than PhIP-Seq</td>
+      </tr>
+      <tr>
+        <td>Alignment Target</td>
+        <td>Designed peptide library sequences</td>
+        <td>Validated UCI–ORF dictionary (mono-associated pairs only)</td>
+      </tr>
+      <tr>
+        <td>Data Structure</td>
+        <td>Count matrix: tiles × samples; overlapping tiles provide implicit redundancy for same antigen</td>
+        <td>Count matrix: UCI-ORF pairs × samples; explicit ~10× UCI redundancy per ORF by design</td>
+      </tr>
+      <tr>
+        <td>Hit Calling</td>
+        <td>edgeR, BEER, or Z-score; per-tile testing; confirmation by tile overlap</td>
+        <td>edgeR; per-UCI testing; confirmation by multi-UCI agreement within ORF</td>
+      </tr>
+      <tr>
+        <td>Protocol Maturity</td>
+        <td><span class="advantage">High</span> — Nature Protocols (2018), video supplement (2022), widely replicated, community pipelines (Phippery, pepsyn)</td>
+        <td><span class="neutral">Medium</span> — primary papers 2021–2022; commercial operation ongoing; full protocol details less openly documented than PhIP-Seq</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- VARIABILITY BY PHASE -->
+  <div class="section-title">Variability Profile by Phase</div>
+  <table class="var-table">
+    <thead>
+      <tr>
+        <th>Phase / Step</th>
+        <th>PhIP-Seq</th>
+        <th>MIPSA</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>A · Library Design</td>
+        <td><span class="badge badge-low">Low</span> &nbsp; <span class="badge badge-high">High</span> &nbsp; <span class="badge badge-high">High</span><br><small style="color:#6b7c8d;font-size:0.78rem">Tile design / oligo synthesis / cloning</small></td>
+        <td><span class="badge badge-low">Low</span> &nbsp; <span class="badge badge-low">Low</span><br><small style="color:#6b7c8d;font-size:0.78rem">Vector design / linearisation</small></td>
+      </tr>
+      <tr>
+        <td>B · Amplification / Self-Assembly</td>
+        <td><span class="badge badge-med">Medium</span><br><small style="color:#6b7c8d;font-size:0.78rem">E. coli phage amplification</small></td>
+        <td><span class="badge badge-med">Medium</span> &nbsp; <span class="badge badge-high">High</span> &nbsp; <span class="badge badge-high">High</span><br><small style="color:#6b7c8d;font-size:0.78rem">IVT / RT-HaloLigand / cell-free translation</small></td>
+      </tr>
+      <tr>
+        <td>C · Immunoprecipitation</td>
+        <td><span class="badge badge-med">Medium</span> &nbsp; <span class="badge badge-high">High</span> &nbsp; <span class="badge badge-high">High</span><br><small style="color:#6b7c8d;font-size:0.78rem">Pre-adsorption / incubation / bead IP</small></td>
+        <td><span class="badge badge-med">Medium</span> &nbsp; <span class="badge badge-med">Medium</span> &nbsp; <span class="badge badge-high">High</span><br><small style="color:#6b7c8d;font-size:0.78rem">Sample prep / incubation / bead IP</small></td>
+      </tr>
+      <tr>
+        <td>D · Sequencing Prep</td>
+        <td><span class="badge badge-med">Medium</span> &nbsp; <span class="badge badge-low">Low</span><br><small style="color:#6b7c8d;font-size:0.78rem">PCR / NGS</small></td>
+        <td><span class="badge badge-med">Medium</span> &nbsp; <span class="badge badge-low">Low</span><br><small style="color:#6b7c8d;font-size:0.78rem">PCR / NGS</small></td>
+      </tr>
+      <tr>
+        <td>E · Data Analysis</td>
+        <td><span class="badge badge-low">Low</span> &nbsp; <span class="badge badge-med">Medium</span><br><small style="color:#6b7c8d;font-size:0.78rem">Alignment / hit calling</small></td>
+        <td><span class="badge badge-low">Low</span> &nbsp; <span class="badge badge-med">Medium</span><br><small style="color:#6b7c8d;font-size:0.78rem">Barcode mapping / hit calling</small></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- PROBE AGGREGATION STRUCTURE -->
+  <div class="probe-note">
+    <h4>The Probe-Aggregation Data Structure — How It Differs Between Technologies</h4>
+    <div class="probe-grid">
+      <div class="probe-col">
+        <h5>PhIP-Seq</h5>
+        <ul>
+          <li>Multiple overlapping tiles cover the same protein region — implicit redundancy, not by explicit design</li>
+          <li>Tiles covering the same epitope are positively correlated; tiles from different regions of the same protein are probing distinct potential epitopes</li>
+          <li>Aggregation across tiles is not formally modelled — confirmation is a post-hoc rule requiring tile overlap to agree</li>
+          <li>Tile-level efficiency differences driven by synthesis bias, cloning loss, and phage display constraints</li>
+        </ul>
+      </div>
+      <div class="probe-col">
+        <h5>MIPSA (Full-Length ORFeome Library)</h5>
+        <ul>
+          <li>~10 UCIs per ORF by explicit design — each is an independent barcoded copy of the same full-length protein</li>
+          <li>UCIs are probing the same target, not different epitopes — closer to the classic microarray multi-probe structure</li>
+          <li>UCI-level efficiency variation is driven by cis vs trans coupling rate (B3) — a function of ORF size and HaloTag maturation kinetics</li>
+          <li>This is the direct structural analogue of the RMA probe-aggregation problem: same target, multiple imperfect probes, known efficiency variation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY DIFFERENCES -->
+  <div class="section-title">Key Differences — Biology and Statistics</div>
+  <div class="callout-grid">
+    <div class="callout callout-bio">
+      <h4>Biological Differences</h4>
+      <ul>
+        <li>MIPSA detects antibodies against conformational epitopes; PhIP-Seq does not — this is the most consequential biological difference for autoimmunity applications</li>
+        <li>PhIP-Seq peptide tiles can include post-translational modification variants (citrullination, phosphorylation) if the modified peptide is synthesised — MIPSA full-length proteins expressed in cell-free system lack most PTMs</li>
+        <li>PhIP-Seq library content is constrained only by DNA synthesis and cloning — virtually any antigen can be included; MIPSA ORFeome requires a source clone library</li>
+        <li>MIPSA background is partly determined by the trans-coupling rate (~50%) — an irreducible biological noise floor from the self-assembly mechanism</li>
+        <li>PhIP-Seq background is partly determined by phage non-specific sticking and E. coli cross-reactive antibodies — structurally different noise sources</li>
+      </ul>
+    </div>
+    <div class="callout callout-stat">
+      <h4>Statistical Differences</h4>
+      <ul>
+        <li>Both technologies produce count matrices with the same statistical distribution family (negative binomial, overdispersed) — core statistical framework is shared</li>
+        <li>MIPSA has explicit, designed-in probe redundancy (~10 UCIs/ORF); PhIP-Seq has implicit redundancy (overlapping tiles) — MIPSA's structure maps more cleanly to a formal probe-aggregation model</li>
+        <li>PhIP-Seq tile-level efficiency variation has multiple drivers (synthesis, cloning, phage display) — harder to model than MIPSA UCI variation, which has a more defined mechanistic source (cis-coupling rate)</li>
+        <li>An RMA-like probe-aggregation model in the negative binomial family applies to both technologies but is more directly motivated by MIPSA's explicit multi-UCI design</li>
+        <li>Both technologies currently use per-probe, per-test inference (edgeR/BEER/Z-score) — neither has a published probe-aggregation model</li>
+        <li>FDR-based inference at scale is a shared limitation — the statistical concerns about p-values and q-values apply equally to both</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ANALYTICAL STATS TABLE -->
+  <div class="section-title">Current Statistical Methods — Shared Framework</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h4>edgeR</h4>
+      <div class="stat-method">Negative Binomial Model</div>
+      <div class="stat-desc">Compares read counts per tile/UCI against mock IPs using a two-group negative binomial GLM with empirical Bayes dispersion estimation. Default method for MIPSA. One of three main methods for PhIP-Seq.</div>
+    </div>
+    <div class="stat-card">
+      <h4>BEER</h4>
+      <div class="stat-method">Bayesian Hierarchical Model</div>
+      <div class="stat-desc">Produces posterior probabilities of enrichment and fold-change estimates. Greater sensitivity for weakly reactive peptides vs edgeR. Used in PhIP-Seq; also applicable to MIPSA. Includes an edgeR pipeline for convenience.</div>
+    </div>
+    <div class="stat-card">
+      <h4>Z-score</h4>
+      <div class="stat-method">Non-parametric Enrichment</div>
+      <div class="stat-desc">Z = (RPM_sample − mean RPM_mock) / SD RPM_mock. Threshold typically Z > 3.5. Simpler and more transparent than model-based methods. Used primarily in PhIP-Seq (DeRisi lab). Less sensitive for weak reactivities.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

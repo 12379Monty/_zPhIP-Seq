@@ -1,0 +1,57 @@
+<script>
+(function() {
+  var sidebar = document.getElementById('site-sidebar');
+  var body    = document.body;
+
+  /* ── Highlight active page link ── */
+  var page = location.pathname.split('/').pop() || 'index.html';
+  var links = sidebar.querySelectorAll('a');
+  for (var i = 0; i < links.length; i++) {
+    if (links[i].getAttribute('href') === page) {
+      links[i].classList.add('active');
+    }
+  }
+
+  /* ── Create the re-open tab (small strip on the left edge) ── */
+  var tab = document.createElement('div');
+  tab.id = 'sidebar-tab';
+  tab.innerHTML = '&#9776;';
+  tab.title = 'Show navigation';
+  document.body.appendChild(tab);
+
+  /* ── Scroll-based hide / show ── */
+  var lastScroll = 0;
+  var delta = 15;
+  var hidden = false;
+
+  function showSidebar() {
+    sidebar.classList.remove('hidden');
+    body.classList.remove('sidebar-hidden');
+    tab.classList.remove('visible');
+    hidden = false;
+  }
+
+  function hideSidebar() {
+    sidebar.classList.add('hidden');
+    body.classList.add('sidebar-hidden');
+    tab.classList.add('visible');
+    hidden = true;
+  }
+
+  window.addEventListener('scroll', function() {
+    var cur = window.pageYOffset || document.documentElement.scrollTop;
+    if (Math.abs(cur - lastScroll) < delta) return;
+
+    if (cur > lastScroll && cur > 80) {
+      hideSidebar();
+    } else {
+      showSidebar();
+    }
+    lastScroll = cur;
+  });
+
+  tab.addEventListener('click', function() {
+    showSidebar();
+  });
+})();
+</script>
